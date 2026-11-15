@@ -363,7 +363,7 @@ dates.forEach((date) =>
         
             if(await checkDateClass(currDate)) {
                 loadedClass = await loadDateClass(currDate);
-                formClassTypes[loadedClass.classType-1].checked = true;
+                formClassTypes[loadedClass.class_type-1].checked = true;
             } else {
                 loadedClass = null;
                 formClassTypes[0].checked = true;

@@ -20,20 +20,6 @@ export const signUp = async (username, email, password) => {
     return true;
 };
 
-export const signUpOtp = async (email, otp) => {
-    const { verifyError } = await db.auth.verifyOtp({
-        email: email.value,
-        token: otp,
-        type: "signup"
-    });
-
-    if(verifyError) {
-        console.error("Error", verifyError);
-    } else{
-        window.location.href = "../"
-    };
-}
-
 export const logIn = async (email, password) => {
     const { error } = await db.auth.signInWithPassword({
         email: email.value,
@@ -106,12 +92,13 @@ export const checkEmailDb = async (email) => {
 
 export const checkTeacherDb = async () => {
     const { data, error } = await db.from("profiles")
-        .select("teacher");
+        .select("teacher")
+        .maybeSingle();
 
     if(error) {
         console.error("Error", error);
     } else {
-        return data[0].teacher;
+        return data.teacher;
     };
 };
 
@@ -140,7 +127,7 @@ export const authChange = (callback) =>
     });
 
 export const classNormal = async (term) => {
-    const { data, error } = await db.from("classNormalDays")
+    const { data, error } = await db.from("class_normal_days")
         .select("class")
         .eq("term", term)
         .order("id", {ascending: true});
@@ -153,7 +140,7 @@ export const classNormal = async (term) => {
 };
 
 export const loadClassType = async () => {
-    const { data, error } = await db.from("classTypes")
+    const { data, error } = await db.from("class_types")
         .select("hour1, hour2, hour3, hour4, hour5, hour6, hour7, hour8, hour9, hour10, hour11");
     
     if(error) {
@@ -164,7 +151,7 @@ export const loadClassType = async () => {
 };
 
 export const checkDateClass = async (date) => {
-    const { data, error } = await db.from("classChanges")
+    const { data, error } = await db.from("class_changes")
         .select("*")
         .eq("date", date)
         .maybeSingle();
@@ -177,7 +164,7 @@ export const checkDateClass = async (date) => {
     };
     
 export const loadDateClass = async (date) => {
-    const { data, error } = await db.from("classChanges")
+    const { data, error } = await db.from("class_changes")
         .select("*")
         .eq("date", date)
         .maybeSingle();
@@ -190,8 +177,8 @@ export const loadDateClass = async (date) => {
 };
 
 export const saveClass = async (date, classType, subject) => {
-    const { data, error } = await db.from("classChanges")
-        .insert({date: date, classType: classType, class: subject});
+    const { data, error } = await db.from("class_changes")
+        .insert({date: date, class_type: classType, class: subject});
 
     if(error) {
         console.error("Error", error);
@@ -201,8 +188,8 @@ export const saveClass = async (date, classType, subject) => {
 };
 
 export const updateClass = async (date, classType, subject) => {
-    const { data, error } = await db.from("classChanges")
-        .update({classType: classType, class: subject})
+    const { data, error } = await db.from("class_changes")
+        .update({class_type: classType, class: subject})
         .eq("date", date);
 
     if(error) {
@@ -213,7 +200,7 @@ export const updateClass = async (date, classType, subject) => {
 };
 
 export const daleteClass = async (date) => {
-    const { data, error } = await db.from("classChanges")
+    const { data, error } = await db.from("class_changes")
         .delete()
         .eq("date", date);
 

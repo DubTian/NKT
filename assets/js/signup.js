@@ -23,7 +23,7 @@ const headerHeight = () => {
     document.documentElement.style.setProperty("--header_height", `${height}px`)
 };
 
-const usernameCheck = async (username) => {
+const usernameCheck = async () => {
     if(username.value.length>=4 && username.value.length<=12 && await checkUsernameDb(username)) {
         errorUsername.style.display = "none"
         username.classList.remove("error-input");
@@ -45,7 +45,7 @@ const usernameCheck = async (username) => {
         return false;
     };
 };
-const emailCheck = async (email) => {
+const emailCheck = async () => {
     if(email.value!=="" && email.checkValidity() && await checkEmailDb(email)) {
         errorEmail.style.display = "none";
         email.classList.remove("error-input");
@@ -67,7 +67,7 @@ const emailCheck = async (email) => {
         return false;
     }
 };
-const passwordCheck = (password) => {
+const passwordCheck = () => {
     if(password.value.length>=8 && /[A-Z]/.test(password.value) && /[a-z]/.test(password.value) && /[0-9]/.test(password.value)) {
         errorPassword.style.display = "none";
         password.classList.remove("error-input");
@@ -89,7 +89,7 @@ const passwordCheck = (password) => {
         return false;
     };
 };
-const passwordAgainCheck = (password, passwordAgain) => {
+const passwordAgainCheck = () => {
     if(passwordAgain.value!=="" && passwordAgain.value===password.value) {
         errorPasswordAgain.style.display = "none";
         passwordAgain.classList.remove("error-input");
@@ -112,28 +112,28 @@ window.addEventListener("resize", headerHeight);
 
 username.addEventListener("input", () => {
     username.value = username.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    usernameCheck(username);
+    usernameCheck();
 });
 email.addEventListener("input", () => {
     email.value = email.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    emailCheck(email);
+    emailCheck();
 });
 password.addEventListener("input", () => {
     password.value = password.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    passwordCheck(password);
+    passwordCheck();
 });
 passwordAgain.addEventListener("input", () => {
     passwordAgain.value = passwordAgain.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    passwordAgainCheck(password, passwordAgain);
+    passwordAgainCheck();
 });
 
 submit.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    const usernameChecked = await usernameCheck(username);
-    const emailChecked = await emailCheck(email);
-    const passwordChecked = passwordCheck(password);
-    const passwordAgainChecked = passwordAgainCheck(password, passwordAgain);
+    const usernameChecked = await usernameCheck();
+    const emailChecked = await emailCheck();
+    const passwordChecked = passwordCheck();
+    const passwordAgainChecked = passwordAgainCheck();
 
     if(usernameChecked && emailChecked && passwordChecked && passwordAgainChecked) {
         main.style.animation = "2s loading linear infinite";

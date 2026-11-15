@@ -22,7 +22,7 @@ const checkUser = async (session) => {
     };
 };
 
-const checkVerifyTeacher = (verifyPassword) => {
+const checkVerifyTeacher = () => {
     if(verifyPassword.value.length === 0) {
         errorVerifyPassword.textContent = "*กรุณากรอกรหัสยืนยันตัวตนครู"
         errorVerifyPassword.style.display = "block";
@@ -43,17 +43,27 @@ logOutNav.addEventListener("click", async (e) => {
     await logOut();
 });
 
+verifyPassword.addEventListener("input", () => {
+    checkVerifyTeacher();
+});
+
 submit.addEventListener("click", async (e) => {
     e.preventDefault();
     
-    if(checkVerifyTeacher(verifyPassword)) {
+    if(checkVerifyTeacher()) {
         main.style.animation = "2s loading linear infinite";
-        if(!(await verifyTeacherDb(verifyPassword))) {
-            errorVerifyPassword.textContent = "*รหัสยืนยันตัวตนครูไม่ถูกต้อง";
+        const verifyMessage = await verifyTeacherDb(verifyPassword);
+        if(!(verifyMessage.success)) {
             errorVerifyPassword.style.display = "block";
             verifyPassword.classList.add("error-input");
+
+            if(verifyMessage.message === 1) {
+                errorVerifyPassword.textContent = "*รหัสยืนยันตัวตนครูไม่ถูกต้อง";
+            } else if(verifyMessage.message === 2){
+                errorVerifyPassword.textContent = `*ใส่รหัสยืนยันตัวตนครูผิดเกิน 3 ครั้ง ต้องรอ ${verifyMessage.minutes}:${verifyMessage.seconds}`;
+            };
         } else {
-            window.location.href = "";
+            window.location.href = "../";
         };
         main.style.removeProperty("animation");
     };

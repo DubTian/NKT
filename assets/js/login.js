@@ -28,7 +28,7 @@ const headerHeight = () => {
     document.documentElement.style.setProperty("--header_height", `${height}px`)
 };
 
-const emailCheck = email => {
+const emailCheck = () => {
     if(email.value!=="" && email.checkValidity()) {
         errorEmail.style.display = "none";
         email.classList.remove("error-input");
@@ -45,7 +45,7 @@ const emailCheck = email => {
         return false;
     };
 };
-const passwordCheck = (password) => {
+const passwordCheck = () => {
     if(password.value.length>=8 && /[A-Z]/.test(password.value) && /[a-z]/.test(password.value) && /[0-9]/.test(password.value)) {
         errorPassword.style.display = "none";
         password.classList.remove("error-input");
@@ -62,7 +62,7 @@ const passwordCheck = (password) => {
         return false;
     };
 };
-const emailOtpCheck = emailOtp => {
+const emailOtpCheck = () => {
     if(emailOtp.value!=="" && emailOtp.checkValidity()) {
         errorEmailOtp.style.display = "none";
         emailOtp.classList.remove("error-input");
@@ -91,22 +91,22 @@ const otpSum = () => {
 
 email.addEventListener("input", () => {
     email.value = email.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    emailCheck(email);
+    emailCheck();
 });
 password.addEventListener("input", () => {
     password.value = password.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    passwordCheck(password);
+    passwordCheck();
 });
 emailOtp.addEventListener("input", () => {
     emailOtp.value = emailOtp.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    emailOtpCheck(emailOtp);
+    emailOtpCheck();
 });
 
 submit.addEventListener("click", async (e) => {
     e.preventDefault();
     
-    const emailChecked = emailCheck(email);
-    const passwordChecked = passwordCheck(password);
+    const emailChecked = emailCheck();
+    const passwordChecked = passwordCheck();
 
     if(emailChecked && passwordChecked) {
         main.style.animation = "2s loading linear infinite";
@@ -139,7 +139,7 @@ backEmail.addEventListener("click", e => {
 submitEmail.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    if(emailOtpCheck(emailOtp)) {
+    if(emailOtpCheck()) {
         main.style.animation = "2s loading linear infinite";
         if(await logInOtp(emailOtp)) {
             verifyEmail.style.display = "none";
