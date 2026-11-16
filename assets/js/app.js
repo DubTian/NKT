@@ -29,6 +29,7 @@ const dateCellHeader = document.getElementById("dateCellHeader");
 const classDay = document.getElementById("classDay");
 
 const classTypeForm = document.getElementById("classTypeForm");
+const swapButton = document.getElementById("swapButton");
 const fixButton = document.getElementById("fixButton");
 const submitFix = document.getElementById("submitFix");
 
@@ -211,12 +212,22 @@ const termChange = async (mv, yv) => {
 };
 
 const clickFixCellClasses = target => {
+    const truth = target.style.backgroundColor === "var(--soft_important)";
+
     for(const item of cellClasses) {
         item.style.backgroundColor = "var(--soft_soft_important)";
         item.style.boxShadow = "none";
     };
-    target.style.backgroundColor = "var(--soft_important)";
-    target.style.boxShadow = "0 0 1.5rem 0.5rem var(--soft_important)";
+
+    if(truth) {
+        swapButton.style.display = "none";
+        submitFix.inert = false;
+    } else {
+        target.style.backgroundColor = "var(--soft_important)";
+        target.style.boxShadow = "0 0 1.5rem 0.5rem var(--soft_important)";
+        swapButton.style.display = "flex";
+        submitFix.inert = true;
+    };
 };
 
 window.addEventListener("reload", headerHeight);
@@ -281,6 +292,10 @@ monthGo.addEventListener("click", async () => {
     calendarCal(monthCount, yearCount);
 });
 
+swapButton.addEventListener("click", e => {
+    e.preventDefault();
+});
+
 fixButton.addEventListener("click", async () => {
     if(await checkTeacherDb()) {
         for(const date of dates) {
@@ -317,6 +332,7 @@ submitFix.addEventListener("click", async () => {
         fixMode = false;
         fixButton.style.display = "flex";
         submitFix.style.display = "none";
+        swapButton.style.display = "none";
         classTypeForm.style.display = "none";
         
         for(const [i, cellClass] of cellClasses.entries()) {

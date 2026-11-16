@@ -12,6 +12,8 @@
     --hover_second: #ffffff;
     --important_color: #FF1229;
     --submit_color: #3BFA1E;
+    --swap_color: #FF9D14;
+
     --soft_first: #CFD2D4;
     --heavy_first: #282D33;
     --heavy_second: #DEE2E3;
@@ -282,6 +284,7 @@ nav div{
     background: transparent;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    transition: transform 0.1s ease-out;
 }
 
 .button:active{
@@ -402,8 +405,9 @@ nav div{
     display: none;
     justify-content: center;
     align-items: center;
+    position: relative;
     margin: 1.3em 0 0;
-    gap: 0.8em;
+    gap: 0.6em;
     font-size: 1rem;
     font-weight: 300;
     -webkit-tap-highlight-color: transparent;
@@ -418,6 +422,29 @@ nav div{
 
 #classTypeForm label{
     cursor: pointer;
+}
+
+#swapButton {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 0;
+    padding: 0.4rem 0.2rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-family: "Sarabun";
+    color: var(--text_color);
+    background-color: var(--swap_color);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.1s ease-out;
+}
+
+#swapButton:active{
+    transform: scale(0.9);
+    opacity: 50%;
 }
 
 #fixButton{
@@ -635,6 +662,11 @@ nav div{
     #classTypeForm{
         font-size: 1.4rem;
     }
+    #swapButton {
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        font-size: 1.4rem;
+    }
     #verifyNoti{
         padding: 4rem 4rem;
         border-radius: 10px;
@@ -667,6 +699,7 @@ nav div{
         font-size: 0.75rem;
     }
     .button{
+        min-width: 25%;
         padding: 0.8rem 3rem;
         margin-top: 5rem;
         font-weight: 400;
@@ -711,6 +744,10 @@ nav div{
     }
     #classTypeForm{
         font-size: 1.7rem;
+    }
+    #swapButton {
+        padding: 0.4rem 2rem;
+        font-size: 2rem;
     }
 }
 
@@ -767,9 +804,9 @@ nav div{
         font-size: clamp(1rem, 1.17vw, 1.3rem);
     }
     .button{
+        min-width: 20%;
         padding: 0.4rem 2.5rem;
         font-size: 1.7rem;
-        transition: transform 0.1s ease-out;
     }
     .button:hover{
         transform: scale(1.2);
@@ -821,6 +858,17 @@ nav div{
     }
     #classTypeForm{
         font-size: 1.4rem;
+    }
+    #swapButton {
+        padding: 0.5rem 2.2rem;
+        font-size: 1.6rem;
+    }
+    #swapButton:hover{
+        transform: scale(1.2);
+    }
+    #swapButton:active{
+        transform: scale(1.1);
+        opacity: 50%;
     }
     #verifyNoti{
         padding: 2.5rem 3rem;
