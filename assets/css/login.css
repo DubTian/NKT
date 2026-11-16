@@ -44,6 +44,7 @@ nav{
     display: flex;
     justify-content: end ;
     align-items: center;
+    margin-left: auto;
 }
 
 nav a{
@@ -132,7 +133,10 @@ input:focus{
 }
 
 .home{
-    font-size: 1.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3rem;
     font-weight: 700;
     text-decoration: none;
     color: var(--text_color);
@@ -156,6 +160,7 @@ input:focus{
 }
 
 .submit{
+    width: 100%;
     padding: 0.5rem 0.8rem;
     border: 2px solid var(--first_color);
     border-radius: 10px;
@@ -210,6 +215,13 @@ input:focus{
 .submitOtp{
     width: 100%;
     padding: 3% 0;
+}
+
+#homeLogo {
+    aspect-ratio: 1/1;
+    height: 1.7rem;
+    margin-right: 0.5rem;
+    object-fit: contain;
 }
 
 #outSubmit{
@@ -349,6 +361,7 @@ input:focus{
         box-shadow: 0 3px 0 var(--important_color);
     }
     .submit{
+        width: 80%;
         border-radius: 20px;
     }
     .desc{
@@ -369,6 +382,10 @@ input:focus{
     .submitOtp{
         padding: 3% 0;
         font-size: 1.3rem;
+    }
+    #homeLogo {
+        height: 3rem;
+        margin-right: 0.8rem;
     }
     #outSubmit{
         margin: 3.5rem auto 0.8rem;
@@ -412,7 +429,10 @@ input:focus{
         padding: 1% 2%;
     }
     .home{
-        font-size: 2.5rem;
+        font-size: 2.6rem;
+    }
+    .submit{
+        width: 70%;
     }
     .desc{
         width: 100%;
@@ -430,6 +450,10 @@ input:focus{
     .descOtp{
         font-size: 1.2rem;
         margin: 0 0 2rem;
+    }
+    #homeLogo {
+        height: 4rem;
+        margin-right: 1rem;
     }
     #submit{
         padding: 0.5rem 1.8rem;
@@ -513,6 +537,10 @@ input:focus{
     .submitOtp{
         padding: 0.5rem 0;
         font-size: 1.4rem;
+    }
+    #homeLogo {
+        height: 3rem;
+        margin-right: 0.8rem;
     }
     #outSubmit{
         margin: 2rem auto 0.9rem;
