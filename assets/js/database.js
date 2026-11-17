@@ -6,6 +6,7 @@ export const signUp = async (username, email, password) => {
         email: email.value,
         password: password.value,
         options: {
+            emailRedirectTo: 'https://dubtian.github.io/NKT/',
             data: {
                 username: username.value,
             },
