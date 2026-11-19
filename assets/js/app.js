@@ -3,12 +3,10 @@ import {
     checkTeacherDb,
     authChange,
     loadClassType,
-    classNormal,
-    checkDateClass,
+    loadNormalClass,
     loadDateClass,
     saveClass,
-    updateClass,
-    daleteClass
+    deleteClass
 } from "./database.js";
 
 const signUpNav = document.getElementById("signUpNav");
@@ -169,26 +167,52 @@ const lastDate = (mv, yv) => {
     };
 };
 
+const beforeClassLoad = async (target) => {
+    if(!target.classList.contains("out-month") && !target.classList.contains("block-day")) {   
+        cell.style.display = "block";
+        dateCount = target.textContent;
+        currDate = `${yearCount-543}-${monthCount+1}-${dateCount}`;
+        loadedClass = await loadDateClass(currDate);
+        
+        if(!!loadedClass?.class_type) {
+            formClassTypes[loadedClass.class_type-1].checked = true;
+        } else {
+            formClassTypes[0].checked = true;
+        };
+            
+        formClassTypes.forEach((formClassType) => formClassType.dispatchEvent(new Event("change")));
+    };
+}
+
 const classLoad = async (dayTh, day) => {
-    for(const classesJr of classes) {
-        classesJr.subject.innerHTML = "&nbsp;";
-        classesJr.teacher.innerHTML = "กำลังโหลด...";
-        classesJr.room.innerHTML = "&nbsp;";
+    for(const item of classes) {
+        item.subject.innerHTML = "&nbsp;";
+        item.teacher.innerHTML = "กำลังโหลด...";
+        item.room.innerHTML = "&nbsp;";
     };
 
     classDay.textContent = dayTh;
 
     if(result[day]) {
-        for(const [i, classesJr] of classes.entries()) {
-            classesJr.subject.innerHTML = result[day].class[i].subject;
-            classesJr.teacher.innerHTML = result[day].class[i].teacher;
-            classesJr.room.innerHTML = result[day].class[i].room;
+        for(const [i, item] of classes.entries()) {
+            item.subject.innerHTML = result[day].class[i].subject;
+            item.teacher.innerHTML = result[day].class[i].teacher;
+            item.room.innerHTML = result[day].class[i].room;
+        };
+        if(!!loadedClass?.class) {  
+            for(const [i, item] of classes.entries()) {
+                if(loadedClass.class[i] !== null) {
+                    item.subject.innerHTML = loadedClass.class[i].subject;
+                    item.teacher.innerHTML = loadedClass.class[i].teacher;
+                    item.room.innerHTML = loadedClass.class[i].room;
+                };
+            };  
         };
     } else {
-        for(const classesJr of classes) {
-            classesJr.subject.innerHTML = "&nbsp;";
-            classesJr.teacher.innerHTML = "ไม่มีข้อมูล";
-            classesJr.room.innerHTML = "&nbsp;";
+        for(const item of classes) {
+            item.subject.innerHTML = "&nbsp;";
+            item.teacher.innerHTML = "ไม่มีข้อมูล";
+            item.room.innerHTML = "&nbsp;";
         };
     };
 };
@@ -206,7 +230,7 @@ const termCheck = (mv, yv) => {
 const termChange = async (mv, yv) => {
     if(term !== termCheck(mv, yv)) {
         term = termCheck(mv, yv);
-        result = await classNormal(term);
+        result = await loadNormalClass(term);
         console.log("load", term)
     };
 };
@@ -251,6 +275,8 @@ const swapA = () => {
 
     for(const [i, item] of cellClasses.entries()) {
         if(item.style.backgroundColor === "var(--soft_important)") {
+            fixClass[0].date = currDate;
+            fixClass[0].class = i+1;
             fixClass[0].subject = classes[i].subject.textContent;
             fixClass[0].teacher = classes[i].teacher.textContent;
             fixClass[0].room = classes[i].room.textContent;
@@ -277,6 +303,8 @@ const swapA = () => {
 const swapB = () => {
     for(const [i, item] of cellClasses.entries()) {
         if(item.style.backgroundColor === "var(--soft_important)") {
+            fixClass[1].date = currDate;
+            fixClass[1].class = i+1;
             fixClass[1].subject = classes[i].subject.textContent;
             fixClass[1].teacher = classes[i].teacher.textContent;
             fixClass[1].room = classes[i].room.textContent;
@@ -288,6 +316,25 @@ const swapB = () => {
                 target.removeEventListener("click", clickCellClasses[j]);
                 clickCellClasses[j] = () => clickFixCellClasses(target);
                 target.addEventListener("click", clickCellClasses[j]);
+            };
+
+            for(const [i, _] of subjectChange.entries()) {
+                if(fixClass[0].class === i+1) {
+                    subjectChange[i] = {
+                        "class": fixClass[0].class,
+                        "subject": fixClass[1].subject,
+                        "teacher": fixClass[1].teacher,
+                        "room": fixClass[1].room
+                    };
+                };
+                if(fixClass[1].class === i+1) {
+                    subjectChange[i] = {
+                        "class": fixClass[1].class,
+                        "subject": fixClass[0].subject,
+                        "teacher": fixClass[0].teacher,
+                        "room": fixClass[0].room
+                    };
+                };
             };
 
             submitFix.inert = false;
@@ -403,6 +450,7 @@ submitFix.addEventListener("click", async () => {
         main.style.animation = "2s loading linear infinite";
 
         const selectedType = Array.from(classTypeForm).find(item => item.checked);
+        const notSubject = subjectChange.every(item => item===null);
         fixMode = false;
         fixButton.style.display = "flex";
         submitFix.style.display = "none";
@@ -416,15 +464,15 @@ submitFix.addEventListener("click", async () => {
             cellClass.removeEventListener("click", clickCellClasses[i]);
         };
 
-        if(await checkDateClass(currDate)) {
-            if(selectedType.value!=1 && selectedType.value!=loadedClass?.classType) {
-                await updateClass(currDate, selectedType.value, null);
-            } else if(selectedType.value==1) {
-                await daleteClass(currDate);
+        if(!!(await loadDateClass(currDate))) {
+            if((selectedType.value!=1 && selectedType.value!=loadedClass?.classType) || !notSubject) {
+                await saveClass(currDate, selectedType.value, subjectChange);
+            } else if(selectedType.value==1 && notSubject) {
+                await deleteClass(currDate);
             };
         } else {
-            if(selectedType.value!=1) {
-                await saveClass(currDate, selectedType.value, null);
+            if(selectedType.value!=1 || !notSubject) {
+                await saveClass(currDate, selectedType.value, subjectChange);
             };
         };
 
@@ -438,8 +486,6 @@ submitFix.addEventListener("click", async () => {
         verifyNoti.offsetHeight;
         verifyNoti.style.animation = "push-noti 0.2s ease-out forwards";
     };
-
-    console.log(fixClass[0].teacher, fixClass[1].teacher);
 });
 
 clossNoti.addEventListener("click", () => {
@@ -449,29 +495,10 @@ clossNoti.addEventListener("click", () => {
     verifyNoti.style.animation = "out-noti 0.2s ease-in forwards";
 });
 
-dates.forEach((date) =>
-    date.addEventListener("click", async () => {
-        if(!date.classList.contains("out-month") && !date.classList.contains("block-day")) {   
-            cell.style.display = "block";
-            dateCount = date.textContent;
-            currDate = `${yearCount-543}-${monthCount+1}-${dateCount}`;
-        
-            if(await checkDateClass(currDate)) {
-                loadedClass = await loadDateClass(currDate);
-                formClassTypes[loadedClass.class_type-1].checked = true;
-            } else {
-                loadedClass = null;
-                formClassTypes[0].checked = true;
-            };
-            
-            formClassTypes.forEach((formClassType) => formClassType.dispatchEvent(new Event("change")));
-        };
-    })
-);
-
 mon.forEach((monJr) =>
     monJr.addEventListener("click", async () => {
         if(!monJr.classList.contains("out-month") && !monJr.classList.contains("block-day")) {
+            await beforeClassLoad(monJr);
             dateCellHeader.innerHTML = `&nbsp;จ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
             classLoad("จันทร์", 0);
         };
@@ -480,6 +507,7 @@ mon.forEach((monJr) =>
 tue.forEach((tueJr) =>
     tueJr.addEventListener("click", async () => {
         if(!tueJr.classList.contains("out-month") && !tueJr.classList.contains("block-day")) {
+            await beforeClassLoad(tueJr);
             dateCellHeader.innerHTML = `&nbsp;อ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
             classLoad("อังคาร", 1);
         };
@@ -488,6 +516,7 @@ tue.forEach((tueJr) =>
 wed.forEach((wedJr) =>
     wedJr.addEventListener("click", async () => {
         if(!wedJr.classList.contains("out-month") && !wedJr.classList.contains("block-day")) {
+            await beforeClassLoad(wedJr);
             dateCellHeader.innerHTML = `&nbsp;พ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
             classLoad("พุธ", 2);
         };
@@ -496,6 +525,7 @@ wed.forEach((wedJr) =>
 thu.forEach((thuJr) =>
     thuJr.addEventListener("click", async () => {
         if(!thuJr.classList.contains("out-month") && !thuJr.classList.contains("block-day")) {
+            await beforeClassLoad(thuJr);
             dateCellHeader.innerHTML = `&nbsp;พฤ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
             classLoad("พฤหัสฯ", 3);
         };
@@ -504,6 +534,7 @@ thu.forEach((thuJr) =>
 fri.forEach((friJr) =>
     friJr.addEventListener("click", async () => {
         if(!friJr.classList.contains("out-month") && !friJr.classList.contains("block-day")) {
+            await beforeClassLoad(friJr);
             dateCellHeader.innerHTML = `&nbsp;ศ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
             classLoad("ศุกร์", 4);
         };
@@ -524,11 +555,13 @@ const classType = await loadClassType();
 
 let fixClass = [
     {
+        class: null,
         subject: null,
         teacher: null,
         room: null
     },
     {
+        class: null,
         subject: null,
         teacher: null,
         room: null
@@ -554,11 +587,12 @@ let monthCount = new Date().getMonth();
 let dateCount;
 let currDate;
 let term = termCheck(monthCount, yearCount);
-let result = await classNormal(term);
+let result = await loadNormalClass(term);
 let fixMode = false;
 let swapMode = false;
 let loadedClass;
-let clickCellClasses = Array.from({length:11});
+let clickCellClasses = Array(11);
+let subjectChange = Array(11).fill(null);
 
 year.textContent = yearCount;
 month.textContent = monthNames[monthCount];

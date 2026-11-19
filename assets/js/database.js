@@ -127,19 +127,6 @@ export const authChange = (callback) =>
         };
     });
 
-export const classNormal = async (term) => {
-    const { data, error } = await db.from("class_normal_days")
-        .select("class")
-        .eq("term", term)
-        .order("id", {ascending: true});
-
-    if(error) {
-        console.error("Error", error);
-    } else {
-        return data;
-    };
-};
-
 export const loadClassType = async () => {
     const { data, error } = await db.from("class_types")
         .select("hour1, hour2, hour3, hour4, hour5, hour6, hour7, hour8, hour9, hour10, hour11");
@@ -151,18 +138,18 @@ export const loadClassType = async () => {
     };
 };
 
-export const checkDateClass = async (date) => {
-    const { data, error } = await db.from("class_changes")
-        .select("*")
-        .eq("date", date)
-        .maybeSingle();
-        
-        if(error) {
-            console.error("Error", error);
-        } else {
-            return !!data;
-        };
+export const loadNormalClass = async (term) => {
+    const { data, error } = await db.from("class_normal_days")
+        .select("class")
+        .eq("term", term)
+        .order("id", {ascending: true});
+
+    if(error) {
+        console.error("Error", error);
+    } else {
+        return data;
     };
+};
     
 export const loadDateClass = async (date) => {
     const { data, error } = await db.from("class_changes")
@@ -178,36 +165,23 @@ export const loadDateClass = async (date) => {
 };
 
 export const saveClass = async (date, classType, subject) => {
-    const { data, error } = await db.from("class_changes")
-        .insert({date: date, class_type: classType, class: subject});
+    const { error } = await db.from("class_changes")
+        .upsert(
+            {date: date, class_type: classType, class: subject},
+            {onConflict: "date"}
+        );
 
     if(error) {
         console.error("Error", error);
-    } else {
-        return data;
     };
 };
 
-export const updateClass = async (date, classType, subject) => {
-    const { data, error } = await db.from("class_changes")
-        .update({class_type: classType, class: subject})
-        .eq("date", date);
-
-    if(error) {
-        console.error("Error", error);
-    } else {
-        return data;
-    };
-};
-
-export const daleteClass = async (date) => {
-    const { data, error } = await db.from("class_changes")
+export const deleteClass = async (date) => {
+    const { error } = await db.from("class_changes")
         .delete()
         .eq("date", date);
 
     if(error) {
         console.error("Error", error);
-    } else {
-        return data;
     };
 };
