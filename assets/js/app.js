@@ -93,11 +93,14 @@ const checkUser = async (session) => {
 };
 
 const calendarCal = (monthCount, yearCount) => {
-    let first = `${yearCount-543}-${monthCount+1}-${1}`;
-    let last = `${yearCount-543}-${monthCount+1}-${lastDate(monthCount, yearCount-543)}`;
-    let firstDay = new Date(first).getDay();
-    let lastDay = new Date(last).getDay();
-    let weekends = [0, 6, 7, 13, 14, 20, 21, 27, 28, 34, 35, 41];
+    const first = `${yearCount-543}-${monthCount+1}-${1}`;
+    const last = `${yearCount-543}-${monthCount+1}-${lastDate(monthCount, yearCount-543)}`;
+    const firstDay = new Date(first).getDay();
+    const lastDay = new Date(last).getDay();
+    const nowDate = new Date().getDate();
+    const nowMonth = new Date().getMonth();
+    const nowYear = new Date().getFullYear();
+    const weekends = [0, 6, 7, 13, 14, 20, 21, 27, 28, 34, 35, 41];
 
     dates[firstDay].textContent = 1;
     dates[firstDay].classList.remove("block-day", "out-month");
@@ -148,6 +151,15 @@ const calendarCal = (monthCount, yearCount) => {
     };
 
     weekends.forEach(weekend => dates[weekend].classList.add("block-day"));
+
+    for(const target of dates) {
+        target.style.removeProperty("color");
+        target.style.removeProperty("font-weight");
+        if(target.textContent==nowDate && monthCount===nowMonth && yearCount-543===nowYear) {
+            target.style.color = "var(--important_color)";
+            target.style.fontWeight = "400";
+        };
+    };
 };
 
 const lastDate = (mv, yv) => {
@@ -231,7 +243,6 @@ const termChange = async (mv, yv) => {
     if(term !== termCheck(mv, yv)) {
         term = termCheck(mv, yv);
         result = await loadNormalClass(term);
-        console.log("load", term)
     };
 };
 
@@ -317,29 +328,53 @@ const swapB = () => {
                 clickCellClasses[j] = () => clickFixCellClasses(target);
                 target.addEventListener("click", clickCellClasses[j]);
             };
-
-            for(const [i, _] of subjectChange.entries()) {
-                if(fixClass[0].class === i+1) {
-                    subjectChange[i] = {
-                        "class": fixClass[0].class,
-                        "subject": fixClass[1].subject,
-                        "teacher": fixClass[1].teacher,
-                        "room": fixClass[1].room
+            
+            for(const [j, _] of cellClasses.entries()) {
+                if(fixClass[0].date === fixClass[1].date) {
+                    if(fixClass[0].class === j+1) {
+                        subjectChange[0].date = fixClass[0].date;
+                        subjectChange[0].class[j] = {
+                            "class": fixClass[0].class,
+                            "subject": fixClass[1].subject,
+                            "teacher": fixClass[1].teacher,
+                            "room": fixClass[1].room
+                        };
                     };
-                };
-                if(fixClass[1].class === i+1) {
-                    subjectChange[i] = {
-                        "class": fixClass[1].class,
-                        "subject": fixClass[0].subject,
-                        "teacher": fixClass[0].teacher,
-                        "room": fixClass[0].room
+                    if(fixClass[1].class === j+1) {
+                        subjectChange[0].date = fixClass[1].date;
+                        subjectChange[0].class[j] = {
+                            "class": fixClass[1].class,
+                            "subject": fixClass[0].subject,
+                            "teacher": fixClass[0].teacher,
+                            "room": fixClass[0].room
+                        };
+                    };
+                } else {
+                    if(fixClass[0].class === j+1) {
+                        subjectChange[0].date = fixClass[0].date;
+                        subjectChange[0].class[j] = {
+                            "class": fixClass[0].class,
+                            "subject": fixClass[1].subject,
+                            "teacher": fixClass[1].teacher,
+                            "room": fixClass[1].room
+                        };
+                    };
+                    if(fixClass[1].class === j+1) {
+                        subjectChange[1].date = fixClass[1].date;
+                        subjectChange[1].class[j] = {
+                            "class": fixClass[1].class,
+                            "subject": fixClass[0].subject,
+                            "teacher": fixClass[0].teacher,
+                            "room": fixClass[0].room
+                        };
                     };
                 };
             };
 
+            swapButton.style.display = "none";
             submitFix.inert = false;
             for(const date of dates) {
-                date.inert = false;
+                date.inert = true;
             };
         };
 
@@ -450,13 +485,14 @@ submitFix.addEventListener("click", async () => {
         main.style.animation = "2s loading linear infinite";
 
         const selectedType = Array.from(classTypeForm).find(item => item.checked);
-        const notSubject = subjectChange.every(item => item===null);
+        const sameDay = fixClass[0].date === fixClass[1].date
+        const notSubject = subjectChange[0].class.every(item => item===null);
         fixMode = false;
         fixButton.style.display = "flex";
         submitFix.style.display = "none";
         swapButton.style.display = "none";
         classTypeForm.style.display = "none";
-        
+
         for(const [i, cellClass] of cellClasses.entries()) {
             cellClass.style.removeProperty("cursor");
             cellClass.style.removeProperty("background-color");
@@ -466,13 +502,23 @@ submitFix.addEventListener("click", async () => {
 
         if(!!(await loadDateClass(currDate))) {
             if((selectedType.value!=1 && selectedType.value!=loadedClass?.classType) || !notSubject) {
-                await saveClass(currDate, selectedType.value, subjectChange);
+                if(sameDay) {
+                    await saveClass(subjectChange[0].date, selectedType.value, subjectChange[0].class);
+                } else {
+                    await saveClass(subjectChange[0].date, selectedType.value, subjectChange[0].class);
+                    await saveClass(subjectChange[1].date, selectedType.value, subjectChange[1].class);
+                };
             } else if(selectedType.value==1 && notSubject) {
                 await deleteClass(currDate);
             };
         } else {
             if(selectedType.value!=1 || !notSubject) {
-                await saveClass(currDate, selectedType.value, subjectChange);
+                if(sameDay) {
+                    await saveClass(subjectChange[0].date, selectedType.value, subjectChange[0].class);
+                } else {
+                    await saveClass(subjectChange[0].date, selectedType.value, subjectChange[0].class);
+                    await saveClass(subjectChange[1].date, selectedType.value, subjectChange[1].class);
+                };
             };
         };
 
@@ -555,18 +601,27 @@ const classType = await loadClassType();
 
 let fixClass = [
     {
+        date: null,
         class: null,
         subject: null,
         teacher: null,
         room: null
     },
     {
+        date: null,
         class: null,
         subject: null,
         teacher: null,
         room: null
     }
 ];
+
+let subjectChange = Array.from({length:2}, (_, i) => {
+    return {
+        date: null,
+        class: Array(11).fill(null)
+    };
+});
 
 let yearCount = new Date().getFullYear()+543;
 let monthNames = [
@@ -592,7 +647,6 @@ let fixMode = false;
 let swapMode = false;
 let loadedClass;
 let clickCellClasses = Array(11);
-let subjectChange = Array(11).fill(null);
 
 year.textContent = yearCount;
 month.textContent = monthNames[monthCount];
@@ -600,3 +654,4 @@ month.textContent = monthNames[monthCount];
 headerHeight();
 calendarCal(monthCount, yearCount);
 authChange((event, session) => checkUser(session));
+

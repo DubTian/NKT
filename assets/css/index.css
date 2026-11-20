@@ -298,11 +298,25 @@ nav div{
     object-fit: contain;
 }
 
-#homeLogo {
+#homeLogo{
     aspect-ratio: 1/1;
     height: 1.7rem;
     margin-right: 0.5rem;
     object-fit: contain;
+}
+
+#logInNav{
+    color: var(--second_color);
+    background-color: var(--first_color);
+}
+
+#logInNav:hover{
+    background-color: var(--heavy_first);
+}
+
+#logInNav:focus{
+    outline: none;
+    background-color: var(--heavy_first);
 }
 
 #logOutNav{

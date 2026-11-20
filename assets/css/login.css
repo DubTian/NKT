@@ -224,6 +224,20 @@ input:focus{
     object-fit: contain;
 }
 
+#logInNav{
+    color: var(--second_color);
+    background-color: var(--first_color);
+}
+
+#logInNav:hover{
+    background-color: var(--heavy_first);
+}
+
+#logInNav:focus{
+    outline: none;
+    background-color: var(--heavy_first);
+}
+
 #outSubmit{
     display: flex;
     flex-direction: column;

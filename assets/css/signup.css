@@ -184,6 +184,20 @@ input:focus{
     opacity: 50%;
 }
 
+#logInNav{
+    color: var(--second_color);
+    background-color: var(--first_color);
+}
+
+#logInNav:hover{
+    background-color: var(--heavy_first);
+}
+
+#logInNav:focus{
+    outline: none;
+    background-color: var(--heavy_first);
+}
+
 #homeLogo {
     aspect-ratio: 1/1;
     height: 1.7rem;
