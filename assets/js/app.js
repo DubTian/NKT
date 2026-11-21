@@ -194,16 +194,16 @@ const beforeClassLoad = async (target) => {
             
         formClassTypes.forEach((formClassType) => formClassType.dispatchEvent(new Event("change")));
     };
-}
+};
 
-const classLoad = async (dayTh, day) => {
+const classLoad = async (day) => {
     for(const item of classes) {
         item.subject.innerHTML = "&nbsp;";
         item.teacher.innerHTML = "กำลังโหลด...";
         item.room.innerHTML = "&nbsp;";
     };
 
-    classDay.textContent = dayTh;
+    classDay.textContent = dayThNames[day];
 
     if(result[day]) {
         for(const [i, item] of classes.entries()) {
@@ -236,7 +236,7 @@ const termCheck = (mv, yv) => {
         return(`${yv}-2`)
     } else {
         return(`${yv-1}-2`)
-    }
+    };
 };
 
 const termChange = async (mv, yv) => {
@@ -487,6 +487,9 @@ submitFix.addEventListener("click", async () => {
         const selectedType = Array.from(classTypeForm).find(item => item.checked);
         const sameDay = fixClass[0].date === fixClass[1].date
         const notSubject = subjectChange[0].class.every(item => item===null);
+        const nowDay = new Date(currDate).getDay();
+        const nowDayMap = dayMap[nowDay];
+        let duplicateClass = false;
         fixMode = false;
         fixButton.style.display = "flex";
         submitFix.style.display = "none";
@@ -500,27 +503,62 @@ submitFix.addEventListener("click", async () => {
             cellClass.removeEventListener("click", clickCellClasses[i]);
         };
 
+        for(const [i, item] of subjectChange[0].class.entries()) {
+            if(item!==null && result[nowDay-1].class[i]!==null) {
+                if(item?.subject===result[nowDay-1].class[i].subject || item?.teacher===result[nowDay-1].class[i].teacher || item?.room===result[nowDay-1].class[i].room) {
+                    duplicateClass = true;
+                    console.log(i)
+                    console.log(item)
+                    console.log(result[nowDay-1].class[i])
+                    console.log(subjectChange[0].class)
+                    console.log(result[nowDay-1].class)
+                    break;
+                };
+            }
+        };
+
+        console.log(selectedType.value==1)
+        console.log(notSubject)
+        console.log(duplicateClass)
+        
         if(!!(await loadDateClass(currDate))) {
-            if((selectedType.value!=1 && selectedType.value!=loadedClass?.classType) || !notSubject) {
+            if((selectedType.value!=1 && selectedType.value!=loadedClass?.classType) && !duplicateClass) {
+                console.log(1)
                 if(sameDay) {
-                    await saveClass(subjectChange[0].date, selectedType.value, subjectChange[0].class);
+                    await saveClass(currDate, selectedType.value, subjectChange[0].class ?? null);
                 } else {
                     await saveClass(subjectChange[0].date, selectedType.value, subjectChange[0].class);
                     await saveClass(subjectChange[1].date, selectedType.value, subjectChange[1].class);
                 };
-            } else if(selectedType.value==1 && notSubject) {
+            } else if((selectedType.value == 1) || duplicateClass) {
+                console.log(2)
                 await deleteClass(currDate);
             };
         } else {
-            if(selectedType.value!=1 || !notSubject) {
+            if((selectedType.value!=1 || !notSubject) && !duplicateClass) {
+                console.log(3)
                 if(sameDay) {
-                    await saveClass(subjectChange[0].date, selectedType.value, subjectChange[0].class);
+                    await saveClass(currDate, selectedType.value, subjectChange[0].class ?? null);
                 } else {
                     await saveClass(subjectChange[0].date, selectedType.value, subjectChange[0].class);
                     await saveClass(subjectChange[1].date, selectedType.value, subjectChange[1].class);
                 };
             };
         };
+        
+        for(const item of nowDayMap.name) {
+            if(item.textContent == dateCount) {
+                await beforeClassLoad(item);
+                classLoad(nowDayMap.index);
+            };
+        };
+
+        subjectChange = Array.from({length:2}, (_, i) => {
+            return {
+                date: null,
+                class: Array(11).fill(null)
+            };
+        });
 
         for(const date of dates) {
             date.inert = false;
@@ -546,7 +584,7 @@ mon.forEach((monJr) =>
         if(!monJr.classList.contains("out-month") && !monJr.classList.contains("block-day")) {
             await beforeClassLoad(monJr);
             dateCellHeader.innerHTML = `&nbsp;จ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
-            classLoad("จันทร์", 0);
+            classLoad(0);
         };
     })
 );
@@ -555,7 +593,7 @@ tue.forEach((tueJr) =>
         if(!tueJr.classList.contains("out-month") && !tueJr.classList.contains("block-day")) {
             await beforeClassLoad(tueJr);
             dateCellHeader.innerHTML = `&nbsp;อ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
-            classLoad("อังคาร", 1);
+            classLoad(1);
         };
     })
 );
@@ -564,7 +602,7 @@ wed.forEach((wedJr) =>
         if(!wedJr.classList.contains("out-month") && !wedJr.classList.contains("block-day")) {
             await beforeClassLoad(wedJr);
             dateCellHeader.innerHTML = `&nbsp;พ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
-            classLoad("พุธ", 2);
+            classLoad(2);
         };
     })
 );
@@ -573,7 +611,7 @@ thu.forEach((thuJr) =>
         if(!thuJr.classList.contains("out-month") && !thuJr.classList.contains("block-day")) {
             await beforeClassLoad(thuJr);
             dateCellHeader.innerHTML = `&nbsp;พฤ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
-            classLoad("พฤหัสฯ", 3);
+            classLoad(3);
         };
     })
 );
@@ -582,7 +620,7 @@ fri.forEach((friJr) =>
         if(!friJr.classList.contains("out-month") && !friJr.classList.contains("block-day")) {
             await beforeClassLoad(friJr);
             dateCellHeader.innerHTML = `&nbsp;ศ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
-            classLoad("ศุกร์", 4);
+            classLoad(4);
         };
     })
 );
@@ -598,6 +636,13 @@ formClassTypes.forEach((formClassType) =>
 );
 
 const classType = await loadClassType();
+const dayMap = {
+    1: {name: mon, index: 0},
+    2: {name: tue, index: 1},
+    3: {name: wed, index: 2},
+    4: {name: thu, index: 3},
+    5: {name: fri, index: 4}
+};
 
 let fixClass = [
     {
@@ -615,7 +660,6 @@ let fixClass = [
         room: null
     }
 ];
-
 let subjectChange = Array.from({length:2}, (_, i) => {
     return {
         date: null,
@@ -640,6 +684,13 @@ let monthNames = [
 ];
 let monthCount = new Date().getMonth();
 let dateCount;
+let dayThNames = [
+    "จันทร์",
+    "อังคาร",
+    "พุธ",
+    "พฤหัสฯ",
+    "ศุกร์"
+];
 let currDate;
 let term = termCheck(monthCount, yearCount);
 let result = await loadNormalClass(term);
@@ -654,4 +705,3 @@ month.textContent = monthNames[monthCount];
 headerHeight();
 calendarCal(monthCount, yearCount);
 authChange((event, session) => checkUser(session));
-
