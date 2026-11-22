@@ -489,7 +489,7 @@ submitFix.addEventListener("click", async () => {
         const notSubject = subjectChange[0].class.every(item => item===null);
         const nowDay = new Date(currDate).getDay();
         const nowDayMap = dayMap[nowDay];
-        let duplicateClass = false;
+        let duplicateClass;
         fixMode = false;
         fixButton.style.display = "flex";
         submitFix.style.display = "none";
@@ -504,22 +504,29 @@ submitFix.addEventListener("click", async () => {
         };
 
         for(const [i, item] of subjectChange[0].class.entries()) {
-            if(item!==null && result[nowDay-1].class[i]!==null) {
-                if(item?.subject===result[nowDay-1].class[i].subject || item?.teacher===result[nowDay-1].class[i].teacher || item?.room===result[nowDay-1].class[i].room) {
-                    duplicateClass = true;
-                    console.log(i)
-                    console.log(item)
-                    console.log(result[nowDay-1].class[i])
-                    console.log(subjectChange[0].class)
-                    console.log(result[nowDay-1].class)
+            if(!(loadedClass?.class)) {
+                if(item !== null) {
+                    duplicateClass= false;
                     break;
                 };
-            }
+                duplicateClass= true;
+            } else {
+                if(item?.subject!==result[nowDay-1].class[i].subject || item?.teacher!==result[nowDay-1].class[i].teacher || item?.room!==result[nowDay-1].class[i].room) {
+                    duplicateClass = false;
+                    break;
+                }
+                duplicateClass = true;
+            };
         };
 
         console.log(selectedType.value==1)
         console.log(notSubject)
         console.log(duplicateClass)
+
+        if(!!(await loadDateClass(currDate))) {
+            if((selectedType.value!=1 && selectedType.value1!=loadedClass.classType) && !duplicateClass) {
+            }
+        }
         
         if(!!(await loadDateClass(currDate))) {
             if((selectedType.value!=1 && selectedType.value!=loadedClass?.classType) && !duplicateClass) {
