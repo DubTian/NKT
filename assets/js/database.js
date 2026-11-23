@@ -164,14 +164,24 @@ export const loadDateClass = async (date) => {
 };
 
 export const saveClass = async (date, classType, subject) => {
-    const { error } = await db.from("class_changes")
-        .upsert(
-            {date: date, class_type: classType, class: subject},
-            {onConflict: "date"}
-        );
-
-    if(error) {
-        console.error("Error", error);
+    if(subject === null) {
+        const { error } = await db.from("class_changes")
+            .upsert(
+                {date: date, class_type: classType},
+                {onConflict: "date"}
+            );
+        if(error) {
+            console.error("Error", error);
+        };
+    } else {
+        const { error } = await db.from("class_changes")
+            .upsert(
+                {date: date, class_type: classType, class: subject},
+                {onConflict: "date"}
+            );
+        if(error) {
+            console.error("Error", error);
+        };
     };
 };
 

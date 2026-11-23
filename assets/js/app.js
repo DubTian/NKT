@@ -273,7 +273,10 @@ const clickChooseCellClasses = target => {
         item.style.boxShadow = "none";
     };
 
-    if(!truth) {
+    if(truth) {
+        swapButton.style.display = "none";
+    } else {
+        swapButton.style.display = "flex";
         target.style.backgroundColor = "var(--soft_important)";
         target.style.boxShadow = "0 0 1.5rem 0.5rem var(--soft_important)";
     };
@@ -294,6 +297,7 @@ const swapA = () => {
 
             swapMode = true;
             swapButton.textContent = "ตกลง";
+            swapButton.style.display = "none";
 
             for(const [j, target] of cellClasses.entries()) {
                 target.removeEventListener("click", clickCellClasses[j]);
@@ -485,11 +489,13 @@ submitFix.addEventListener("click", async () => {
         main.style.animation = "2s loading linear infinite";
 
         const selectedType = Array.from(classTypeForm).find(item => item.checked);
-        const sameDay = fixClass[0].date === fixClass[1].date
         const notSubject = subjectChange[0].class.every(item => item===null);
+        const sameDay = fixClass[0].date === fixClass[1].date;
         const nowDay = new Date(currDate).getDay();
         const nowDayMap = dayMap[nowDay];
-        let duplicateClass;
+        const duplicateClass = Array.from({length:2}, () => true)
+        const fix = subjectChange;
+
         fixMode = false;
         fixButton.style.display = "flex";
         submitFix.style.display = "none";
@@ -503,52 +509,72 @@ submitFix.addEventListener("click", async () => {
             cellClass.removeEventListener("click", clickCellClasses[i]);
         };
 
-        for(const [i, item] of subjectChange[0].class.entries()) {
-            if(!(loadedClass?.class)) {
-                if(item !== null) {
-                    duplicateClass= false;
+        if(!notSubject) {
+            console.log(1)
+            let og = result[(new Date(fix[0].date).getDay())-1].class;
+            let now = await loadDateClass(fix[0].date);
+            for(const [i, item] of fix[0].class.entries()) {
+                const final = item ?? now?.class?.[i] ?? null;
+                if(final === null) {
+                    console.log("continue")
+                    continue;
+                };
+                
+                if((final.subject!=og[i].subject) || (final.teacher!=og[i].teacher) || (final.room!=og[i].room)) {
+                    duplicateClass[0] = false;
+                    console.log(final)
+                    console.log(og[i])
                     break;
                 };
-                duplicateClass= true;
-            } else {
-                if(item?.subject!==result[nowDay-1].class[i].subject || item?.teacher!==result[nowDay-1].class[i].teacher || item?.room!==result[nowDay-1].class[i].room) {
-                    duplicateClass = false;
-                    break;
-                }
-                duplicateClass = true;
+            };
+            
+            if(!sameDay) {
+                og = result[(new Date(fix[1].date).getDay())-1].class;
+                now = await loadDateClass(fix[1].date);
+                for(const [i, item] of fix[1].class.entries()) {
+                    const final = item ?? now?.class?.[i] ?? null;
+                    if(final === null) {
+                        continue;
+                    };
+                    
+                    if((final.subject!=og[i].subject) || (final.teacher!=og[i].teacher) || (final.room!=og[i].room)) {
+                        duplicateClass[1] = false;
+                        break;
+                    };
+                };
             };
         };
-
-        console.log(selectedType.value==1)
-        console.log(notSubject)
-        console.log(duplicateClass)
-
-        if(!!(await loadDateClass(currDate))) {
-            if((selectedType.value!=1 && selectedType.value1!=loadedClass.classType) && !duplicateClass) {
-            }
-        }
         
-        if(!!(await loadDateClass(currDate))) {
-            if((selectedType.value!=1 && selectedType.value!=loadedClass?.classType) && !duplicateClass) {
-                console.log(1)
-                if(sameDay) {
-                    await saveClass(currDate, selectedType.value, subjectChange[0].class ?? null);
-                } else {
-                    await saveClass(subjectChange[0].date, selectedType.value, subjectChange[0].class);
-                    await saveClass(subjectChange[1].date, selectedType.value, subjectChange[1].class);
-                };
-            } else if((selectedType.value == 1) || duplicateClass) {
-                console.log(2)
+        console.log(duplicateClass[0])
+        if(notSubject) {
+            if(selectedType.value!=1 && selectedType.value!=loadedClass?.class_type) {
+                console.log("add")
+                await saveClass(currDate, selectedType.value, null);
+            } else if(selectedType.value==1 && loadedClass?.class && loadedClass.class_type!=1) {
+                await saveClass(currDate, selectedType.value, null);
+            } else if(selectedType.value==1 && !(await loadDateClass(currDate))?.class) {
+                console.log("del")
                 await deleteClass(currDate);
             };
         } else {
-            if((selectedType.value!=1 || !notSubject) && !duplicateClass) {
-                console.log(3)
-                if(sameDay) {
-                    await saveClass(currDate, selectedType.value, subjectChange[0].class ?? null);
-                } else {
-                    await saveClass(subjectChange[0].date, selectedType.value, subjectChange[0].class);
-                    await saveClass(subjectChange[1].date, selectedType.value, subjectChange[1].class);
+            if(sameDay) {
+                if(!duplicateClass[0]) {
+                    console.log("add-table")
+                    await saveClass(fix[0].date, selectedType.value, fix[0].class)
+                } else if(selectedType.value==1 && duplicateClass[0]) {
+                    console.log("del-table")
+                    await deleteClass(currDate);
+                };
+            } else {
+                if(!duplicateClass[0]) {
+                    await saveClass(fix[0].date, selectedType.value, fix[0].class);
+                } else if(selectedType.value==1 && duplicateClass[0]) {
+                    await deleteClass(fix[0].date);
+                };
+                if(!duplicateClass[1]) {
+                    await saveClass(fix[1].date, selectedType.value, fix[1].class);
+                } else if(selectedType.value==1 && duplicateClass[1]) {
+                    await deleteClass(fix[1].date);
                 };
             };
         };
@@ -560,7 +586,7 @@ submitFix.addEventListener("click", async () => {
             };
         };
 
-        subjectChange = Array.from({length:2}, (_, i) => {
+        subjectChange = Array.from({length:2}, () => {
             return {
                 date: null,
                 class: Array(11).fill(null)
@@ -667,7 +693,7 @@ let fixClass = [
         room: null
     }
 ];
-let subjectChange = Array.from({length:2}, (_, i) => {
+let subjectChange = Array.from({length:2}, () => {
     return {
         date: null,
         class: Array(11).fill(null)
