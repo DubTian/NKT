@@ -24,7 +24,15 @@ const monthGo = document.getElementById("monthGo");
 
 const cell = document.getElementById("cell");
 const dateCellHeader = document.getElementById("dateCellHeader");
+const cellheaderText = document.getElementById("cellheaderText");
+const classCell = document.getElementById("classCell");
 const classDay = document.getElementById("classDay");
+
+const homeworkButton = document.getElementById("homeworkButton");
+const cellButton = document.getElementById("cellButton");
+const homework = document.getElementById("homework");
+const homeworkBlock = document.getElementById("homeworkBlock");
+const homeworkFix = document.getElementById("homeworkFix");
 
 const classTypeForm = document.getElementById("classTypeForm");
 const swapButton = document.getElementById("swapButton");
@@ -449,6 +457,15 @@ monthGo.addEventListener("click", async () => {
     calendarCal(monthCount, yearCount);
 });
 
+homeworkButton.addEventListener("click", () => {
+    homework.style.display = "block";
+    cellButton.style.display = "block";
+    classCell.style.display = "none";
+    homeworkButton.style.display = "none";
+    fixButton.style.display = "none";
+    cellheaderText.textContent = "การบ้าน";
+});
+
 swapButton.addEventListener("click", e => {
     e.preventDefault();
 
@@ -466,6 +483,7 @@ fixButton.addEventListener("click", async () => {
         };
 
         fixMode = true;
+        homeworkButton.style.display = "none";
         fixButton.style.display = "none";
         submitFix.style.display = "flex";
         classTypeForm.style.display = "flex";
@@ -497,6 +515,7 @@ submitFix.addEventListener("click", async () => {
         const fix = subjectChange;
 
         fixMode = false;
+        homeworkButton.style.display = "flex";
         fixButton.style.display = "flex";
         submitFix.style.display = "none";
         swapButton.style.display = "none";
@@ -510,20 +529,16 @@ submitFix.addEventListener("click", async () => {
         };
 
         if(!notSubject) {
-            console.log(1)
             let og = result[(new Date(fix[0].date).getDay())-1].class;
             let now = await loadDateClass(fix[0].date);
             for(const [i, item] of fix[0].class.entries()) {
                 const final = item ?? now?.class?.[i] ?? null;
                 if(final === null) {
-                    console.log("continue")
                     continue;
                 };
                 
                 if((final.subject!=og[i].subject) || (final.teacher!=og[i].teacher) || (final.room!=og[i].room)) {
                     duplicateClass[0] = false;
-                    console.log(final)
-                    console.log(og[i])
                     break;
                 };
             };
@@ -545,24 +560,19 @@ submitFix.addEventListener("click", async () => {
             };
         };
         
-        console.log(duplicateClass[0])
         if(notSubject) {
             if(selectedType.value!=1 && selectedType.value!=loadedClass?.class_type) {
-                console.log("add")
                 await saveClass(currDate, selectedType.value, null);
             } else if(selectedType.value==1 && loadedClass?.class && loadedClass.class_type!=1) {
                 await saveClass(currDate, selectedType.value, null);
             } else if(selectedType.value==1 && !(await loadDateClass(currDate))?.class) {
-                console.log("del")
                 await deleteClass(currDate);
             };
         } else {
             if(sameDay) {
                 if(!duplicateClass[0]) {
-                    console.log("add-table")
                     await saveClass(fix[0].date, selectedType.value, fix[0].class)
                 } else if(selectedType.value==1 && duplicateClass[0]) {
-                    console.log("del-table")
                     await deleteClass(currDate);
                 };
             } else {

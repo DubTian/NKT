@@ -239,6 +239,26 @@ nav div{
     cursor: default;
 }
 
+.miniButton {
+    position: absolute;
+    right: 2%;
+    aspect-ratio: 1/1;
+    border-radius: 4px;
+    height: 1.2rem;
+    background-color: var(--swap_color);
+    cursor: pointer;
+    transition: transform 0.15s ease-out;
+}
+
+.miniButton:hover {
+    transform: scale(1.1);
+}
+
+.miniButton:active {
+    transform: scale(0.9);
+    opacity: 50%;
+}
+
 .cell-block{
     display: flex;
     flex-direction: column;
@@ -392,13 +412,14 @@ nav div{
     display: none;
     margin: 0 0.75rem 1.5rem;
     font-family: "Sarabun";
-    font-size: 0.32rem;
+    font-size: 0.3rem;
     font-weight: 400;
 }
 
 #cellHeader{
     display: flex;
     justify-content: center;
+    position: relative;
     margin-bottom: 1rem;
 }
 
@@ -406,6 +427,26 @@ nav div{
     font-family: "Noto Sans Thai";
     font-size: 1.2rem;
     font-weight: 450;
+}
+
+#cellButton{
+    display: none;
+}
+
+#homework{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#homeworkBlock div{
+    display: flex;
+    gap: 1rem;
+}
+
+#homeworkFix {
+    display: flex;
+    background-color: var(--important_color);
 }
 
 #classCell{
@@ -605,6 +646,10 @@ nav div{
     .out-month:hover{
         font-size: 2rem;
     }
+    .miniButton {
+        height: 2.4rem;
+        border-radius: 8px;
+    }
     .cell-hour{
         font-size: 0.7rem;
     }
@@ -705,6 +750,10 @@ nav div{
     }
     .calendar-block{
         outline: 0.25vw solid var(--first_color);
+    }
+    .miniButton {
+        height: 3.5rem;
+        border-radius: 10px;
     }
     .cell-hour{
         font-size: 1rem;
