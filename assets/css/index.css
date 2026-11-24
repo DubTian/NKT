@@ -434,14 +434,18 @@ nav div{
 }
 
 #homework{
+    z-index: 2;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-#homeworkBlock div{
-    display: flex;
-    gap: 1rem;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 40%;
+    transform: translateX(100%);
+    border-left: 3px solid var(--first_color);
+    background-color: var(--swap_color);
 }
 
 #homeworkFix {
@@ -521,6 +525,7 @@ nav div{
     width: 100%;
     background-color: var(--text_color);
     opacity: 0.4;
+    cursor: pointer;
 }
 
 #verifyNoti{
@@ -569,21 +574,21 @@ nav div{
     }
 }
 
+@keyframes slide-R-to-L{
+    0%{
+        transform: translateX(100%);
+    }
+    100%{
+        transform: translateX(0);
+    }
+}
+
 @keyframes push-noti{
     0%{
         transform: translateX(-50%) translateY(-50%) scale(0); 
     }
     100%{
         transform: translateX(-50%) translateY(-50%) scale(1); 
-    }
-}
-
-@keyframes out-noti{
-    0%{
-        transform: translateX(-50%) translateY(-50%) scale(1); 
-    }
-    100%{
-        transform: translateX(-50%) translateY(-50%) scale(0); 
     }
 }
 

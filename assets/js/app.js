@@ -24,22 +24,17 @@ const monthGo = document.getElementById("monthGo");
 
 const cell = document.getElementById("cell");
 const dateCellHeader = document.getElementById("dateCellHeader");
-const cellheaderText = document.getElementById("cellheaderText");
-const classCell = document.getElementById("classCell");
 const classDay = document.getElementById("classDay");
 
 const homeworkButton = document.getElementById("homeworkButton");
-const cellButton = document.getElementById("cellButton");
 const homework = document.getElementById("homework");
-const homeworkBlock = document.getElementById("homeworkBlock");
-const homeworkFix = document.getElementById("homeworkFix");
+const overlay = document.getElementById("overlay");
 
 const classTypeForm = document.getElementById("classTypeForm");
 const swapButton = document.getElementById("swapButton");
 const fixButton = document.getElementById("fixButton");
 const submitFix = document.getElementById("submitFix");
 
-const overlay = document.getElementById("overlay");
 const verifyNoti = document.getElementById("verifyNoti");
 const clossNoti = document.getElementById("clossNoti");
 
@@ -458,12 +453,17 @@ monthGo.addEventListener("click", async () => {
 });
 
 homeworkButton.addEventListener("click", () => {
-    homework.style.display = "block";
-    cellButton.style.display = "block";
-    classCell.style.display = "none";
-    homeworkButton.style.display = "none";
-    fixButton.style.display = "none";
-    cellheaderText.textContent = "การบ้าน";
+    overlay.style.display = "block"
+    homework.style.animation = "none";
+    void homework.offsetWidth;
+    homework.style.animation = "slide-R-to-L 0.2s ease-out forwards";
+});
+
+overlay.addEventListener("click", () => {
+    homework.style.animation = "none";
+    void homework.offsetWidth;
+    homework.style.animation = "slide-R-to-L 0.25s ease-out reverse forwards";
+    overlay.style.display = "none"
 });
 
 swapButton.addEventListener("click", e => {
@@ -619,7 +619,7 @@ clossNoti.addEventListener("click", () => {
     overlay.style.display = "none";
     verifyNoti.style.animation = "none";
     verifyNoti.offsetHeight;
-    verifyNoti.style.animation = "out-noti 0.2s ease-in forwards";
+    verifyNoti.style.animation = "push-noti 0.2s ease-out reverse forwards";
 });
 
 mon.forEach((monJr) =>
