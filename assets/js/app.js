@@ -557,15 +557,12 @@ submitFix.addEventListener("click", async () => {
                     await deleteClass(currDate);
                 };
             } else {
-                if(!duplicateClass[0]) {
-                    await saveClass(fix[0].date, selectedType.value, fix[0].class);
-                } else if(selectedType.value==1 && duplicateClass[0]) {
-                    await deleteClass(fix[0].date);
-                };
-                if(!duplicateClass[1]) {
-                    await saveClass(fix[1].date, selectedType.value, fix[1].class);
-                } else if(selectedType.value==1 && duplicateClass[1]) {
-                    await deleteClass(fix[1].date);
+                for(const [i, item] of duplicateClass.entries()) {
+                    if(!item) {
+                        await saveClass(fix[i].date, selectedType.value, fix[i].class);
+                    } else if(selectedType.value==1) {
+                        await deleteClass(fix[i].date);
+                    };
                 };
             };
         };
