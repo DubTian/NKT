@@ -447,10 +447,11 @@ nav div{
     padding: 0.4rem 0.2rem;
     border: none;
     border-radius: 5px;
+    gap: 0 0.25em;
     font-size: 0.8rem;
     font-family: "Sarabun";
-    color: var(--text_color);
-    background-color: var(--swap_color);
+    color: var(--swap_color);
+    background-color: var(--first_color);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     transition: transform 0.1s ease-out;
@@ -459,6 +460,12 @@ nav div{
 #swapButton:active{
     transform: scale(0.9);
     opacity: 50%;
+}
+
+#swapButton img{
+    aspect-ratio: 1/1;
+    height: 0.9rem;
+    object-fit: contain;
 }
 
 #fixButton{
@@ -681,6 +688,9 @@ nav div{
         border-radius: 10px;
         font-size: 1.4rem;
     }
+    #swapButton img{
+        height: 1.5rem;
+    }
     #verifyNoti{
         padding: 4rem 4rem;
         border-radius: 10px;
@@ -762,6 +772,9 @@ nav div{
     #swapButton {
         padding: 0.4rem 2rem;
         font-size: 2rem;
+    }
+    #swapButton img{
+        height: 1.9rem;
     }
 }
 
@@ -883,6 +896,9 @@ nav div{
     #swapButton:active{
         transform: scale(1.1);
         opacity: 50%;
+    }
+    #swapButton img{
+        height: 1.8rem;
     }
     #verifyNoti{
         padding: 2.5rem 3rem;

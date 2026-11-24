@@ -325,7 +325,7 @@ const swapB = () => {
             fixClass[1].room = classes[i].room.textContent;
 
             swapMode = false;
-            swapButton.textContent = "สลับ";
+            swapButton.innerHTML = `<img src="./assets/pictures/swap.webp" alt="">สลับกับ`;
 
             for(const [j, target] of cellClasses.entries()) {
                 target.removeEventListener("click", clickCellClasses[j]);
