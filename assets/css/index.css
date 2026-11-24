@@ -437,15 +437,22 @@ nav div{
     z-index: 2;
     display: flex;
     justify-content: center;
-    align-items: center;
     position: fixed;
     top: 0;
     right: 0;
     height: 100%;
-    width: 40%;
+    width: 55%;
+    padding: 2%;
+    border-left: 2px solid var(--first_color);
+    font-family: "Sarabun";
     transform: translateX(100%);
-    border-left: 3px solid var(--first_color);
-    background-color: var(--swap_color);
+    background-color: var(--second_color);
+}
+
+#homework h1{
+    font-family: "Noto Sans Thai";
+    font-size: 1rem;
+    font-weight: 500;
 }
 
 #homeworkFix {
@@ -719,6 +726,14 @@ nav div{
     #cellHeader h4{
         font-size: 1.5rem;
     }
+    #homework{
+        width: 55%;
+        border-left: 3px solid var(--first_color);
+    }
+    #homework h1{
+        font-size: 2rem;
+        font-weight: 600;
+    }
     #classCell{
         grid-template-columns: 2.5fr repeat(11, 3.5fr);
         grid-template-rows: repeat(2, 1.5fr) 4fr;
@@ -805,6 +820,12 @@ nav div{
     }
     #cellHeader h4{
         font-size: 1.9rem;
+    }
+    #homework{
+        padding: 1.7%;
+    }
+    #homework h1{
+        font-size: 2.3rem;
     }
     #classCell{
         grid-template-columns: 2.5fr repeat(11, 3.5fr);
@@ -919,6 +940,12 @@ nav div{
     }
     #cellHeader{
         margin-bottom: 3rem;
+    }
+    #homework{
+        padding: 1%;
+    }
+    #homework h1{
+        font-size: 1.7rem;
     }
     #classCell{
         grid-template-columns: 2.5fr repeat(11, 3.5fr);

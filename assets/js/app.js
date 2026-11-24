@@ -27,8 +27,9 @@ const dateCellHeader = document.getElementById("dateCellHeader");
 const classDay = document.getElementById("classDay");
 
 const homeworkButton = document.getElementById("homeworkButton");
-const homework = document.getElementById("homework");
 const overlay = document.getElementById("overlay");
+const homework = document.getElementById("homework");
+const dateHomework = document.getElementById("dateHomework");
 
 const classTypeForm = document.getElementById("classTypeForm");
 const swapButton = document.getElementById("swapButton");
@@ -457,12 +458,14 @@ homeworkButton.addEventListener("click", () => {
     homework.style.animation = "none";
     void homework.offsetWidth;
     homework.style.animation = "slide-R-to-L 0.2s ease-out forwards";
+
+    dateHomework.innerHTML = `${dateCount}/${monthCount+1}/${yearCount}`;
 });
 
 overlay.addEventListener("click", () => {
     homework.style.animation = "none";
     void homework.offsetWidth;
-    homework.style.animation = "slide-R-to-L 0.25s ease-out reverse forwards";
+    homework.style.animation = "slide-R-to-L 0.15s ease-out reverse forwards";
     overlay.style.display = "none"
 });
 
