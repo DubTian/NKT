@@ -197,13 +197,13 @@ const beforeClassLoad = async (target) => {
 };
 
 const classLoad = async (day) => {
+    classDay.textContent = dayThNames[day];
+
     for(const item of classes) {
         item.subject.innerHTML = "&nbsp;";
         item.teacher.innerHTML = "กำลังโหลด...";
         item.room.innerHTML = "&nbsp;";
     };
-
-    classDay.textContent = dayThNames[day];
 
     if(result[day]) {
         for(const [i, item] of classes.entries()) {
@@ -714,7 +714,6 @@ let dayThNames = [
 ];
 let currDate;
 let term = termCheck(monthCount, yearCount);
-let result = await loadNormalClass(term);
 let fixMode = false;
 let swapMode = false;
 let loadedClass;
@@ -726,3 +725,5 @@ month.textContent = monthNames[monthCount];
 headerHeight();
 calendarCal(monthCount, yearCount);
 authChange((event, session) => checkUser(session));
+
+let result = await loadNormalClass(term);
