@@ -50,7 +50,7 @@ nav{
 nav a{
     padding: 0.2rem 0.4rem;
     border-radius: 5px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 400;
     text-decoration: none;
     color: var(--text_color);

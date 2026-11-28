@@ -194,3 +194,38 @@ export const deleteClass = async (date) => {
         console.error("Error", error);
     };
 };
+
+export const loadDateHomework = async (date) => {
+    const { data, error } = await db.from("class_homeworks")
+        .select("*")
+        .eq("date", date)
+        .maybeSingle();
+
+    if(error) {
+        console.error("Error", error);
+    } else {
+        return data;
+    };
+};
+
+export const saveHomework = async (date, homework) => {
+    const { error } = await db.from("class_homeworks")
+        .upsert(
+            {date: date, homework: homework},
+            {onConflict: "date"}
+        );
+
+    if(error) {
+        console.error("Error", error);
+    };
+};
+
+export const deleteHomework = async (date) => {
+    const { error } = await db.from("class_homeworks")
+        .delete()
+        .eq("date", date);
+
+    if(error) {
+        console.error("Error", error);
+    };
+};

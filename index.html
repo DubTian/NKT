@@ -179,14 +179,18 @@
                 </button>
             </div>
         </section>
-        <div id="overlay"></div>
+        <div class="overlay" id="homeworkOverlay"></div>
     </main>
     <div id="homework">
-        <h1>การบ้าน <span id="dateHomework"></span></h1>
+        <h1>การบ้าน <span id="homeworkDate"></span></h1>
+        <div id="homeworkTable"></div>
     </div>
-    <div id="verifyNoti">
-        ยังไม่ได้ยืนยันสถานะครู
-        <button id="clossNoti">X</button>
+    <div class="overlay" id="delOverlay"></div>
+    <div id="homeworkDelNoti">
+        <label id="delNotiTitle"></label>
+        <button class="notiButton" id="delNotiFix">แก้ไข</button>
+        <button class="notiButton" id="delNotiDel">ลบ</button>
+        <button id="clossDelNoti">X</button>
     </div>
 </body>
 </html>

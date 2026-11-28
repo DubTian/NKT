@@ -32,18 +32,20 @@ const usernameCheck = async () => {
         errorUsername.textContent = "*กรุณากรอกชื่อบัญชี"
         errorUsername.style.display = "block"
         username.classList.add("error-input");
-        return false;
     } else if(username.value.length<4 || username.value.length>12) {
         errorUsername.textContent = "*ชื่อบัญชีต้องมี 4-12 ตัวอักษร"
         errorUsername.style.display = "block"
         username.classList.add("error-input");
-        return false;
     } else if(!(await checkUsernameDb(username))) {
         errorUsername.textContent = "*ชื่อบัญชีนี้ถูกใช้ไปแล้ว"
         errorUsername.style.display = "block"
         username.classList.add("error-input");
-        return false;
     };
+
+    username.style.animation = "none";
+    void username.offsetWidth;
+    username.style.animation = "shake 0.3s ease-in-out";
+    return false;
 };
 const emailCheck = async () => {
     if(email.value!=="" && email.checkValidity() && await checkEmailDb(email)) {
@@ -54,18 +56,20 @@ const emailCheck = async () => {
         errorEmail.textContent = "*กรุณากรอกอีเมล"
         errorEmail.style.display = "block";
         email.classList.add("error-input");
-        return false;
     } else if(!email.checkValidity()) {
         errorEmail.textContent = "*กรุณากรอกอีเมลที่ถูกต้อง";
         errorEmail.style.display = "block";
         email.classList.add("error-input");
-        return false;
     } else if(!(await checkEmailDb(email))) {
         errorEmail.textContent = "*อีเมลนี้ถูกใช้ไปแล้ว";
         errorEmail.style.display = "block";
         email.classList.add("error-input");
-        return false;
-    }
+    };
+
+    email.style.animation = "none";
+    void email.offsetWidth;
+    email.style.animation = "shake 0.3s ease-in-out";
+    return false;
 };
 const passwordCheck = () => {
     if(password.value.length>=8 && /[A-Z]/.test(password.value) && /[a-z]/.test(password.value) && /[0-9]/.test(password.value)) {
@@ -76,18 +80,20 @@ const passwordCheck = () => {
         errorPassword.textContent = "*กรุณากรอกรหัสผ่าน"
         errorPassword.style.display = "block";
         password.classList.add("error-input");
-        return false;
     } else if(password.value.length<8) {
         errorPassword.textContent = "*รหัสผ่านต้องมีอย่างน้อย 8 ตัว"
         errorPassword.style.display = "block";
         password.classList.add("error-input");
-        return false;
     } else if(!(/[A-Z]/.test(password.value)) || !(/[a-z]/.test(password.value)) || !(/\d/.test(password.value))) {
         errorPassword.textContent = "*กรุณากรอกรหัสผ่านโดยมีตัวพิมพ์เล็ก พิมพ์ใหญ่ และตัวเลข"
         errorPassword.style.display = "block";
         password.classList.add("error-input");
-        return false;
     };
+
+    password.style.animation = "none";
+    void password.offsetWidth;
+    password.style.animation = "shake 0.3s ease-in-out";
+    return false;
 };
 const passwordAgainCheck = () => {
     if(passwordAgain.value!=="" && passwordAgain.value===password.value) {
@@ -98,33 +104,68 @@ const passwordAgainCheck = () => {
         errorPasswordAgain.textContent = "*กรุณากรอกรหัสผ่านอีกครั้ง"
         errorPasswordAgain.style.display = "block";
         passwordAgain.classList.add("error-input");
-        return false;
     } else if(passwordAgain.value!==password.value) {
         errorPasswordAgain.textContent = "*กรุณากรอกรหัสผ่านที่เหมือนกัน"
         errorPasswordAgain.style.display = "block";
         passwordAgain.classList.add("error-input");
-        return false;
     };
+
+    passwordAgain.style.animation = "none";
+    void passwordAgain.offsetWidth;
+    passwordAgain.style.animation = "shake 0.3s ease-in-out";
+    return false;
 };
 
 window.addEventListener("reload", headerHeight);
 window.addEventListener("resize", headerHeight);
 
 username.addEventListener("input", () => {
-    username.value = username.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    usernameCheck();
+    clearTimeout(timerCheck);
+    if(/[^A-Za-z0-9_]/.test(username.value)) {
+        username.style.animation = "none";
+        void username.offsetWidth;
+        username.style.animation = "shake 0.3s ease-in-out";
+    };
+    username.value = username.value.replace(/[^A-Za-z0-9_]/g, "");
+    timerCheck = setTimeout(() => {
+        usernameCheck();
+    }, 400);
 });
 email.addEventListener("input", () => {
+    clearTimeout(timerCheck);
+    if(/[^A-Za-z0-9@#$!+*/=^._-]/.test(email.value)) {
+        email.style.animation = "none";
+        void email.offsetWidth;
+        email.style.animation = "shake 0.3s ease-in-out";
+    };
     email.value = email.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    emailCheck();
+    timerCheck = setTimeout(() => {
+        emailCheck();
+    }, 400);
 });
 password.addEventListener("input", () => {
+    clearTimeout(timerCheck);
+    if(/[^A-Za-z0-9@#$!+*/=^._-]/.test(password.value)) {
+        password.style.animation = "none";
+        void password.offsetWidth;
+        password.style.animation = "shake 0.3s ease-in-out";
+    };
     password.value = password.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    passwordCheck();
+    timerCheck = setTimeout(() => {
+        passwordCheck();
+    }, 400);
 });
 passwordAgain.addEventListener("input", () => {
+    clearTimeout(timerCheck);
+    if(/[^A-Za-z0-9@#$!+*/=^._-]/.test(passwordAgain.value)) {
+        passwordAgain.style.animation = "none";
+        void passwordAgain.offsetWidth;
+        passwordAgain.style.animation = "shake 0.3s ease-in-out";
+    };
     passwordAgain.value = passwordAgain.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    passwordAgainCheck();
+    timerCheck = setTimeout(() => {
+        passwordAgainCheck();
+    }, 400);
 });
 
 submit.addEventListener("click", async (e) => {
@@ -138,7 +179,7 @@ submit.addEventListener("click", async (e) => {
     if(usernameChecked && emailChecked && passwordChecked && passwordAgainChecked) {
         main.style.animation = "2s loading linear infinite";
         if(await signUp(username, email, password)) {
-            formSignUp.style.display = "none"
+            formSignUp.style.display = "none";
             verifyPage.style.display = "flex";
         };
         main.style.removeProperty("animation");
@@ -146,8 +187,12 @@ submit.addEventListener("click", async (e) => {
 });
 
 otpAgain.addEventListener("click", async (e) => {
+    otpAgain.disabled = true
+    timerOtp = setTimeout(() => {
+        otpAgain.disabled = false;
+    }, 60000);
     await signUp(username, email, password)
-})
+});
 
 inputs.forEach((input, index) =>
     input.addEventListener("keydown", e => {
@@ -159,6 +204,9 @@ inputs.forEach((input, index) =>
         };
     })
 );
+
+let timerCheck;
+let timerOtp;
 
 headerHeight();
 authChange((event, session) => {

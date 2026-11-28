@@ -37,13 +37,16 @@ const emailCheck = () => {
         errorEmail.textContent = "*กรุณากรอกอีเมล"
         errorEmail.style.display = "block";
         email.classList.add("error-input");
-        return false;
     } else if(!email.checkValidity()) {
         errorEmail.textContent = "*กรุณากรอกอีเมลที่ถูกต้อง";
         errorEmail.style.display = "block";
         email.classList.add("error-input");
-        return false;
     };
+
+    email.style.animation = "none";
+    void email.offsetWidth;
+    email.style.animation = "shake 0.3s ease-in-out";
+    return false;
 };
 const passwordCheck = () => {
     if(password.value.length>=8 && /[A-Z]/.test(password.value) && /[a-z]/.test(password.value) && /[0-9]/.test(password.value)) {
@@ -54,13 +57,16 @@ const passwordCheck = () => {
         errorPassword.textContent = "*กรุณากรอกรหัสผ่าน"
         errorPassword.style.display = "block";
         password.classList.add("error-input");
-        return false;
     } else if(password.value.length<8) {
         errorPassword.textContent = "*รหัสผ่านต้องมีอย่างน้อย 8 ตัว"
         errorPassword.style.display = "block";
         password.classList.add("error-input");
-        return false;
     };
+
+    password.style.animation = "none";
+    void password.offsetWidth;
+    password.style.animation = "shake 0.3s ease-in-out";
+    return false;
 };
 const emailOtpCheck = () => {
     if(emailOtp.value!=="" && emailOtp.checkValidity()) {
@@ -71,35 +77,61 @@ const emailOtpCheck = () => {
         errorEmailOtp.textContent = "*กรุณากรอกอีเมล"
         errorEmailOtp.style.display = "block";
         emailOtp.classList.add("error-input");
-        return false;
     } else if(!emailOtp.checkValidity()) {
         errorEmailOtp.textContent = "*กรุณากรอกอีเมลที่ถูกต้อง";
         errorEmailOtp.style.display = "block";
         emailOtp.classList.add("error-input");
-        return false;
     };
+
+    emailOtp.style.animation = "none";
+    void emailOtp.offsetWidth;
+    emailOtp.style.animation = "shake 0.3s ease-in-out";
+    return false;
 };
 
 const otpSum = () => {
     let sum = "";
     otps.forEach(otp => {
         sum += otp.value;
-        console.log(sum)
     });
     return(sum);
 };
 
 email.addEventListener("input", () => {
+    clearTimeout(timerCheck);
+    if(/[^A-Za-z0-9@#$!+*/=^._-]/.test(email.value)) {
+        email.style.animation = "none";
+        void email.offsetWidth;
+        email.style.animation = "shake 0.3s ease-in-out";
+    };
     email.value = email.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    emailCheck();
+    timerCheck = setTimeout(() => {
+        emailCheck();
+    }, 400);
 });
 password.addEventListener("input", () => {
+    clearTimeout(timerCheck);
+    if(/[^A-Za-z0-9@#$!+*/=^._-]/.test(password.value)) {
+        password.style.animation = "none";
+        void password.offsetWidth;
+        password.style.animation = "shake 0.3s ease-in-out";
+    };
     password.value = password.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    passwordCheck();
+    timerCheck = setTimeout(() => {
+        passwordCheck();
+    }, 400);
 });
 emailOtp.addEventListener("input", () => {
+    clearTimeout(timerCheck);
+    if(/[^A-Za-z0-9@#$!+*/=^._-]/.test(emailOtp.value)) {
+        emailOtp.style.animation = "none";
+        void emailOtp.offsetWidth;
+        emailOtp.style.animation = "shake 0.3s ease-in-out";
+    };
     emailOtp.value = emailOtp.value.replace(/[^A-Za-z0-9@#$!+*/=^._-]/g, "");
-    emailOtpCheck();
+    timerCheck = setTimeout(() => { 
+        emailOtpCheck();
+    }, 400);
 });
 
 submit.addEventListener("click", async (e) => {
@@ -111,7 +143,7 @@ submit.addEventListener("click", async (e) => {
     if(emailChecked && passwordChecked) {
         main.style.animation = "2s loading linear infinite";
         if(await logIn(email, password)) {
-            errorPassword.textContent = "*อีเมลหรือรหัสผ่านผิด"
+            errorPassword.textContent = "*อีเมลหรือรหัสผ่านผิด";
             errorPassword.style.display = "block";
             password.classList.add("error-input");
         };
@@ -158,16 +190,21 @@ submitOtp.addEventListener("click", async (e) => {
     main.style.removeProperty("animation");
 });
 
-otps.forEach((otp, index) => {
+otps.forEach((otp, i) => {
     otp.addEventListener("input", () => {
+        if(/[^\d]/.test(otp.value)) {
+            otp.style.animation = "none";
+            void otp.offsetWidth;
+            otp.style.animation = "shake 0.3s ease-in-out";
+        };
         otp.value = otp.value.replace(/[^\d]/g, "");
-        if(otp.value && index<otps.length-1) {
-            otps[index+1].focus();
+        if(otp.value && i<otps.length-1) {
+            otps[i+1].focus();
         };
     });
     otp.addEventListener("keydown", e => {
-        if(e.key==="Backspace" && !otp.value && index>0) {
-            otps[index-1].focus();
+        if(e.key==="Backspace" && !otp.value && i>0) {
+            otps[i-1].focus();
         };
     });
     otp.addEventListener("paste", e => {
@@ -175,9 +212,9 @@ otps.forEach((otp, index) => {
 
         if(/^\d+$/.test(pasted)) {
             const numValue = pasted.split("");
-            otps.forEach((otp, index) => {
-                if(numValue[index]) {
-                    otp.value = numValue[index];
+            otps.forEach((otp, j) => {
+                if(numValue[j]) {
+                    otp.value = numValue[j];
                 };
             });
             const lastIndex = Math.min(numValue.length, otps.length)-1;
@@ -186,16 +223,18 @@ otps.forEach((otp, index) => {
     });
 });
 
-inputs.forEach((input, index) =>
+inputs.forEach((input, i) =>
     input.addEventListener("keydown", e => {
         if(e.key === "Enter") {
-            if(input.value && (index < inputs.length-1)) {
+            if(input.value && (i < inputs.length-1)) {
                 e.preventDefault();
-                inputs[index+1].focus();
+                inputs[i+1].focus();
             };
         };
     })
 );
+
+let timerCheck;
 
 headerHeight();
 authChange((event, session) => {

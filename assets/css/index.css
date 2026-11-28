@@ -21,9 +21,11 @@
     --soft_important: #FF3044;
     --soft_soft_important: #FF4A5C;
     --heavy_important: #A3121E;
+    --heavy_submit: #32D91A;
     --button_active: #D4D4D4;
 
     --header_height: 0px;
+    --homework_row: 0;
 }
 
 html{
@@ -55,7 +57,7 @@ nav{
 nav a{
     padding: 0.2rem 0.4rem;
     border-radius: 5px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 400;
     text-decoration: none;
     color: var(--text_color);
@@ -286,19 +288,46 @@ nav div{
     cursor: pointer;
 }
 
+.homework-title{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+    padding: 0.4em 0.2em;
+    font-size: 0.7rem;
+    font-weight: 500;
+    outline: 0.1rem solid var(--first_color);
+    background-color: var(--second_color);
+    word-break: break-word;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.homework-sub{
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    padding: 0.4em 0.8em;
+    font-size: 0.5rem;
+    outline: 0.1rem solid var(--first_color);
+    background-color: var(--second_color);
+    word-break: break-word;
+    -webkit-tap-highlight-color: transparent;
+}
+
 .button{
     display: none;
     justify-content: center;
     align-items: center;
-    min-width: 12%;
-    padding: 0.3rem 1.5rem;
+    min-width: 50%;
+    padding: 0.4rem 1.5rem;
     border: none;
     border-radius: 5px;
     margin: 2rem auto 0;
     gap: 0 0.25em;
     font-family: "Sarabun";
     font-size: 0.8rem;
-    font-weight: 200;
+    font-weight: 400;
     letter-spacing: 0.05rem;
     color: var(--hover_second);
     background: transparent;
@@ -316,6 +345,35 @@ nav div{
     aspect-ratio: 1/1;
     height: 1.07rem;
     object-fit: contain;
+}
+
+.notiButton{
+    width: 85%;
+    margin: 0.6em 0;
+    border: none;
+    border-radius: 9999px;
+    padding: 0.4em 0.8em;
+    font-size: 1.1rem;
+    font-family: "Noto Sans Thai";
+    background-color: transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.notiButton:active{
+    transform: scale(0.9);
+    opacity: 50%;
+}
+
+.overlay{
+    display: none;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    height: 100vh;
+    width: 100%;
+    background-color: var(--text_color);
+    opacity: 0.4;
 }
 
 #homeLogo{
@@ -433,19 +491,30 @@ nav div{
     display: none;
 }
 
+#classCell{
+    display: grid;
+    grid-template-columns: 2.5fr repeat(11, 3.5fr);
+    grid-template-rows: repeat(2, 0.5fr) 1.5fr;
+    width: 100%;
+}
+
 #homework{
     z-index: 2;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     position: fixed;
     top: 0;
     right: 0;
     height: 100%;
     width: 55%;
+    overflow-x: hidden;
+    overflow-y: scroll;
     padding: 2%;
     border-left: 2px solid var(--first_color);
     font-family: "Sarabun";
     transform: translateX(100%);
+    scrollbar-color: var(--first_color) var(--second_color);
     background-color: var(--second_color);
 }
 
@@ -455,16 +524,17 @@ nav div{
     font-weight: 500;
 }
 
-#homeworkFix {
-    display: flex;
-    background-color: var(--important_color);
+#homeworkTable{
+    display: grid;
+    grid-template-columns: 2fr 5fr;
+    grid-template-rows: repeat(var(--homework_row), 1fr);
+    width: 90%;
+    margin-top: 1rem;
 }
 
-#classCell{
-    display: grid;
-    grid-template-columns: 2.5fr repeat(11, 3.5fr);
-    grid-template-rows: repeat(2, 0.5fr) 1.5fr;
-    width: 100%;
+#homeworkOverlay{
+    z-index: 1;
+    cursor: pointer;
 }
 
 #classTypeForm{
@@ -522,36 +592,47 @@ nav div{
     background-color: var(--submit_color);
 }
 
-#overlay{
-    z-index: 1;
-    display: none;
-    position: fixed;
-    top: 0%;
-    left: 0%;
-    height: 100vh;
-    width: 100%;
-    background-color: var(--text_color);
-    opacity: 0.4;
-    cursor: pointer;
+#delOverlay{
+    z-index: 2;
 }
 
-#verifyNoti{
+#homeworkDelNoti{
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     position: fixed;
     top: 40%;
     left: 50%;
+    width: 70%;
     transform: translateX(-50%) translateY(-50%) scale(0);
-    padding: 3rem 2rem;
+    padding: 2rem 2rem;
     border: var(--first_color) solid 3px;
     border-radius: 5px;
     font-family: "Noto Sans Thai";
-    font-size: 1.5rem;
     white-space: nowrap;
     color: var(--text_color);
     background-color: var(--second_color);
 }
 
-#clossNoti{
+#delNotiTitle{
+    margin-bottom: 0.7rem;
+    font-size: 1.3rem;
+}
+
+#delNotiFix{
+    color: var(--important_color);
+    border: 2px solid var(--important_color);
+}
+
+#delNotiDel{
+    color: var(--second_color);
+    background-color: var(--important_color);
+    border: 2px solid var(--important_color);
+}
+
+#clossDelNoti{
     position: absolute;
     top: 2%;
     right: 4%;
@@ -559,6 +640,7 @@ nav div{
     border: none;
     font-size: 1.8rem;
     font-family: inherit;
+    color: var(--text_color);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
@@ -668,13 +750,20 @@ nav div{
     .cell-time{
         font-size: 0.5rem;
     }
+    .homework-title{
+        font-size: 1rem;
+        outline: 0.15rem solid var(--first_color);
+    }
+    .homework-sub{
+        font-size: 0.8rem;
+        outline: 0.15rem solid var(--first_color);
+    }
     .button{
         min-width: 15%;
         border-radius: 10px;
         padding: 0.6rem 2.5rem;
         margin-top: 3rem;
         font-size: 1.5rem;
-        font-weight: 300;
     }
     .button img{
         height: 2rem;
@@ -726,6 +815,10 @@ nav div{
     #cellHeader h4{
         font-size: 1.5rem;
     }
+    #classCell{
+        grid-template-columns: 2.5fr repeat(11, 3.5fr);
+        grid-template-rows: repeat(2, 1.5fr) 4fr;
+    }
     #homework{
         width: 55%;
         border-left: 3px solid var(--first_color);
@@ -733,10 +826,6 @@ nav div{
     #homework h1{
         font-size: 2rem;
         font-weight: 600;
-    }
-    #classCell{
-        grid-template-columns: 2.5fr repeat(11, 3.5fr);
-        grid-template-rows: repeat(2, 1.5fr) 4fr;
     }
     #classTypeForm{
         font-size: 1.4rem;
@@ -746,12 +835,21 @@ nav div{
         border-radius: 10px;
         font-size: 1.4rem;
     }
-    #verifyNoti{
+    #homeworkDelNoti{
         padding: 4rem 4rem;
         border-radius: 10px;
-        font-size: 3rem;
     }
-    #clossNoti{
+    #delNotiTitle{
+        margin-bottom: 0.8rem;
+        font-size: 1.8rem;
+    }
+    #delNotiFix{
+        border: 3px solid var(--important_color);
+    }
+    #delNotiDel{
+        border: 3px solid var(--important_color);
+    }
+    #clossDelNoti{
         font-size: 2.5rem;
     }
 }
@@ -781,11 +879,21 @@ nav div{
     .cell-time{
         font-size: 0.75rem;
     }
+    .homework-title{
+        font-size: 1.2rem;
+    }
+    .homework-sub{
+        font-size: 1rem;
+    }
     .button{
         min-width: 25%;
         padding: 0.8rem 3rem;
         margin-top: 5rem;
         font-weight: 400;
+    }
+    .notiButton{
+        width: 90%;
+        font-size: 1.4rem;
     }
     #homeLogo {
         height: 4rem;
@@ -821,21 +929,27 @@ nav div{
     #cellHeader h4{
         font-size: 1.9rem;
     }
+    #classCell{
+        grid-template-columns: 2.5fr repeat(11, 3.5fr);
+        grid-template-rows: repeat(2, 1fr) 2fr;
+    }
     #homework{
         padding: 1.7%;
     }
     #homework h1{
         font-size: 2.3rem;
     }
-    #classCell{
-        grid-template-columns: 2.5fr repeat(11, 3.5fr);
-        grid-template-rows: repeat(2, 1fr) 2fr;
-    }
     #classTypeForm{
         font-size: 1.7rem;
     }
     #swapButton {
         padding: 0.4rem 2rem;
+        font-size: 2rem;
+    }
+    #homeworkDelNoti{
+        width: 60%; 
+    }
+    #delNotiTitle{
         font-size: 2rem;
     }
 }
@@ -892,6 +1006,12 @@ nav div{
     .cell-time{
         font-size: clamp(1rem, 1.17vw, 1.3rem);
     }
+    .homework-title{
+        font-size: 1.1rem;
+    }
+    .homework-sub{
+        font-size: 0.9rem;
+    }
     .button{
         min-width: 20%;
         padding: 0.4rem 2.5rem;
@@ -906,6 +1026,10 @@ nav div{
     }
     .button img{
         height: 2.27rem;
+    }
+    .notiButton{
+        width: 90%;
+        font-size: 1.3rem;
     }
     #homeLogo {
         height: 3rem;
@@ -941,15 +1065,15 @@ nav div{
     #cellHeader{
         margin-bottom: 3rem;
     }
+    #classCell{
+        grid-template-columns: 2.5fr repeat(11, 3.5fr);
+        grid-template-rows: repeat(2, 1.2fr) 2.5fr;
+    }
     #homework{
         padding: 1%;
     }
     #homework h1{
         font-size: 1.7rem;
-    }
-    #classCell{
-        grid-template-columns: 2.5fr repeat(11, 3.5fr);
-        grid-template-rows: repeat(2, 1.2fr) 2.5fr;
     }
     #classTypeForm{
         font-size: 1.4rem;
@@ -965,12 +1089,14 @@ nav div{
         transform: scale(1.1);
         opacity: 50%;
     }
-    #verifyNoti{
+    #homeworkDelNoti{
+        width: 45%;
         padding: 2.5rem 3rem;
-        border-radius: 10px;
-        font-size: 2.2rem;
     }
-    #clossNoti{
+    #delNotiTitle{
+        font-size: 1.8rem;
+    }
+    #clossDelNoti{
         font-size: 1.8rem;
     }
 }

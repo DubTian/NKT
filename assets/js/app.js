@@ -6,7 +6,10 @@ import {
     loadNormalClass,
     loadDateClass,
     saveClass,
-    deleteClass
+    deleteClass,
+    loadDateHomework,
+    saveHomework,
+    deleteHomework
 } from "./database.js";
 
 const signUpNav = document.getElementById("signUpNav");
@@ -27,17 +30,20 @@ const dateCellHeader = document.getElementById("dateCellHeader");
 const classDay = document.getElementById("classDay");
 
 const homeworkButton = document.getElementById("homeworkButton");
-const overlay = document.getElementById("overlay");
+const homeworkOverlay = document.getElementById("homeworkOverlay");
 const homework = document.getElementById("homework");
-const dateHomework = document.getElementById("dateHomework");
+const homeworkDate = document.getElementById("homeworkDate");
+const homeworkTable = document.getElementById("homeworkTable");
 
 const classTypeForm = document.getElementById("classTypeForm");
 const swapButton = document.getElementById("swapButton");
 const fixButton = document.getElementById("fixButton");
 const submitFix = document.getElementById("submitFix");
 
-const verifyNoti = document.getElementById("verifyNoti");
-const clossNoti = document.getElementById("clossNoti");
+const homeworkDelNoti = document.getElementById("homeworkDelNoti");
+const delNotiTitle = document.getElementById("delNotiTitle");
+const clossDelNoti = document.getElementById("clossDelNoti");
+const delOverlay = document.getElementById("delOverlay");
 
 const cellClasses = document.querySelectorAll(".cell-class");
 const dates = document.querySelectorAll(".date");
@@ -189,31 +195,39 @@ const beforeClassLoad = async (target) => {
         dateCount = target.textContent;
         currDate = `${yearCount-543}-${monthCount+1}-${dateCount}`;
         loadedClass = await loadDateClass(currDate);
+        loadedHomework = await loadDateHomework(currDate);
         
         if(!!loadedClass?.class_type) {
             formClassTypes[loadedClass.class_type-1].checked = true;
         } else {
             formClassTypes[0].checked = true;
         };
-            
+        
         formClassTypes.forEach((formClassType) => formClassType.dispatchEvent(new Event("change")));
     };
 };
 
 const classLoad = async (day) => {
+    homeworkLoad();
+    classDay.textContent = dayMap[day].nameThL;
+    
+    if(window.matchMedia("(min-width: 768px)").matches) {
+        dateCellHeader.innerHTML = `&nbsp;${dayMap[day].nameThS}&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
+    } else {
+        dateCellHeader.innerHTML = `&nbsp;${dayMap[day].nameThS}&nbsp;${dateCount}/${monthCount+1}/${yearCount}`;
+    };
+
     for(const item of classes) {
         item.subject.innerHTML = "&nbsp;";
         item.teacher.innerHTML = "กำลังโหลด...";
         item.room.innerHTML = "&nbsp;";
     };
 
-    classDay.textContent = dayThNames[day];
-
-    if(result[day]) {
+    if(result[day-1]) {
         for(const [i, item] of classes.entries()) {
-            item.subject.innerHTML = result[day].class[i].subject;
-            item.teacher.innerHTML = result[day].class[i].teacher;
-            item.room.innerHTML = result[day].class[i].room;
+            item.subject.innerHTML = result[day-1].class[i].subject;
+            item.teacher.innerHTML = result[day-1].class[i].teacher;
+            item.room.innerHTML = result[day-1].class[i].room;
         };
         if(!!loadedClass?.class) {  
             for(const [i, item] of classes.entries()) {
@@ -232,6 +246,33 @@ const classLoad = async (day) => {
         };
     };
 };
+
+const homeworkLoad = () => {
+    if(!!(loadedHomework)) {
+        document.documentElement.style.setProperty("--homework_row", `${loadedHomework.homework.length}`);
+        homeworkTable.innerHTML = "";
+        for(const item of loadedHomework.homework) {
+            const titleDiv = document.createElement("div");
+            const subDiv = document.createElement("div");
+            titleDiv.textContent = item.subject;
+            subDiv.textContent = item.desc;
+            titleDiv.className = "homework-title";
+            subDiv.className = "homework-sub";
+
+            titleDiv.addEventListener("click", () => {
+                delOverlay.style.display = "block";
+                homeworkDelNoti.style.animation = "none";
+                homeworkDelNoti.offsetHeight;
+                homeworkDelNoti.style.animation = "push-noti 0.2s ease-out forwards";
+
+                delNotiTitle.textContent = item.subject;
+            })
+
+            homeworkTable.appendChild(titleDiv);
+            homeworkTable.appendChild(subDiv);
+        };
+    };
+}
 
 const termCheck = (mv, yv) => {
     if(mv>=4 && mv<=8) {
@@ -261,11 +302,13 @@ const clickFixCellClasses = target => {
     if(truth) {
         swapButton.style.display = "none";
         submitFix.inert = false;
+        submitFix.style.backgroundColor = "var(--submit_color)";
     } else {
         target.style.backgroundColor = "var(--soft_important)";
         target.style.boxShadow = "0 0 1.5rem 0.5rem var(--soft_important)";
         swapButton.style.display = "flex";
         submitFix.inert = true;
+        submitFix.style.backgroundColor = "var(--heavy_submit)";
     };
 };
 
@@ -381,6 +424,7 @@ const swapB = () => {
 
             swapButton.style.display = "none";
             submitFix.inert = false;
+            submitFix.style.backgroundColor = "var(--submit_color)";
             for(const date of dates) {
                 date.inert = true;
             };
@@ -454,19 +498,19 @@ monthGo.addEventListener("click", async () => {
 });
 
 homeworkButton.addEventListener("click", () => {
-    overlay.style.display = "block"
+    homeworkOverlay.style.display = "block"
     homework.style.animation = "none";
     void homework.offsetWidth;
     homework.style.animation = "slide-R-to-L 0.2s ease-out forwards";
 
-    dateHomework.innerHTML = `${dateCount}/${monthCount+1}/${yearCount}`;
+    homeworkDate.innerHTML = `${dateCount}/${monthCount+1}/${yearCount}`;
 });
 
-overlay.addEventListener("click", () => {
+homeworkOverlay.addEventListener("click", () => {
     homework.style.animation = "none";
     void homework.offsetWidth;
     homework.style.animation = "slide-R-to-L 0.15s ease-out reverse forwards";
-    overlay.style.display = "none"
+    homeworkOverlay.style.display = "none"
 });
 
 swapButton.addEventListener("click", e => {
@@ -497,11 +541,6 @@ fixButton.addEventListener("click", async () => {
             cellClass.style.backgroundColor = "var(--soft_soft_important)";
             cellClass.addEventListener("click", clickCellClasses[i]);
         };
-    } else {
-        overlay.style.display = "block";
-        verifyNoti.style.animation = "none";
-        verifyNoti.offsetHeight;
-        verifyNoti.style.animation = "push-noti 0.2s ease-out forwards";
     };
 });
 
@@ -536,16 +575,25 @@ submitFix.addEventListener("click", async () => {
             let now = await loadDateClass(fix[0].date);
             for(const [i, item] of fix[0].class.entries()) {
                 const final = item ?? now?.class?.[i] ?? null;
-                if(final === null) {
-                    continue;
-                };
+                if(final === null) continue;
                 
                 if((final.subject!=og[i].subject) || (final.teacher!=og[i].teacher) || (final.room!=og[i].room)) {
                     duplicateClass[0] = false;
                     break;
                 };
             };
-            
+
+            for(const [i, item] of fix[0].class.entries()) {
+                const final = item ?? now?.class?.[i] ?? null;
+                if(final === null) continue;
+                
+                if((final.subject==og[i].subject) && (final.teacher==og[i].teacher) && (final.room==og[i].room)) {
+                    fix[0].class[i] = null;
+                } else {
+                    fix[0].class[i] = final;
+                };
+            };
+
             if(!sameDay) {
                 og = result[(new Date(fix[1].date).getDay())-1].class;
                 now = await loadDateClass(fix[1].date);
@@ -560,9 +608,20 @@ submitFix.addEventListener("click", async () => {
                         break;
                     };
                 };
+
+                for(const [i, item] of fix[1].class.entries()) {
+                    const final = item ?? now?.class?.[i] ?? null;
+                    if(final === null) continue;
+                
+                    if((final.subject==og[i].subject) && (final.teacher==og[i].teacher) && (final.room==og[i].room)) {
+                        fix[1].class[i] = null;
+                    }   else {
+                        fix[1].class[i] = final;
+                    };
+                };
             };
         };
-        
+
         if(notSubject) {
             if(selectedType.value!=1 && selectedType.value!=loadedClass?.class_type) {
                 await saveClass(currDate, selectedType.value, null);
@@ -591,11 +650,11 @@ submitFix.addEventListener("click", async () => {
                 };
             };
         };
-        
+
         for(const item of nowDayMap.name) {
             if(item.textContent == dateCount) {
                 await beforeClassLoad(item);
-                classLoad(nowDayMap.index);
+                classLoad(nowDay);
             };
         };
 
@@ -610,27 +669,21 @@ submitFix.addEventListener("click", async () => {
             date.inert = false;
         };
         main.style.removeProperty("animation");
-    } else {
-        overlay.style.display = "block";
-        verifyNoti.style.animation = "none";
-        verifyNoti.offsetHeight;
-        verifyNoti.style.animation = "push-noti 0.2s ease-out forwards";
     };
 });
 
-clossNoti.addEventListener("click", () => {
-    overlay.style.display = "none";
-    verifyNoti.style.animation = "none";
-    verifyNoti.offsetHeight;
-    verifyNoti.style.animation = "push-noti 0.2s ease-out reverse forwards";
+clossDelNoti.addEventListener("click", () => {
+    delOverlay.style.display = "none";
+    homeworkDelNoti.style.animation = "none";
+    homeworkDelNoti.offsetHeight;
+    homeworkDelNoti.style.animation = "push-noti 0.2s ease-out reverse forwards";
 });
 
 mon.forEach((monJr) =>
     monJr.addEventListener("click", async () => {
         if(!monJr.classList.contains("out-month") && !monJr.classList.contains("block-day")) {
             await beforeClassLoad(monJr);
-            dateCellHeader.innerHTML = `&nbsp;จ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
-            classLoad(0);
+            classLoad(1);
         };
     })
 );
@@ -638,8 +691,7 @@ tue.forEach((tueJr) =>
     tueJr.addEventListener("click", async () => {
         if(!tueJr.classList.contains("out-month") && !tueJr.classList.contains("block-day")) {
             await beforeClassLoad(tueJr);
-            dateCellHeader.innerHTML = `&nbsp;อ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
-            classLoad(1);
+            classLoad(2);
         };
     })
 );
@@ -647,8 +699,7 @@ wed.forEach((wedJr) =>
     wedJr.addEventListener("click", async () => {
         if(!wedJr.classList.contains("out-month") && !wedJr.classList.contains("block-day")) {
             await beforeClassLoad(wedJr);
-            dateCellHeader.innerHTML = `&nbsp;พ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
-            classLoad(2);
+            classLoad(3);
         };
     })
 );
@@ -656,8 +707,7 @@ thu.forEach((thuJr) =>
     thuJr.addEventListener("click", async () => {
         if(!thuJr.classList.contains("out-month") && !thuJr.classList.contains("block-day")) {
             await beforeClassLoad(thuJr);
-            dateCellHeader.innerHTML = `&nbsp;พฤ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
-            classLoad(3);
+            classLoad(4);
         };
     })
 );
@@ -665,8 +715,7 @@ fri.forEach((friJr) =>
     friJr.addEventListener("click", async () => {
         if(!friJr.classList.contains("out-month") && !friJr.classList.contains("block-day")) {
             await beforeClassLoad(friJr);
-            dateCellHeader.innerHTML = `&nbsp;ศ.&nbsp;${dateCount}&nbsp;${monthNames[monthCount]}&nbsp;${yearCount}`;
-            classLoad(4);
+            classLoad(5);
         };
     })
 );
@@ -683,11 +732,11 @@ formClassTypes.forEach((formClassType) =>
 
 const classType = await loadClassType();
 const dayMap = {
-    1: {name: mon, index: 0},
-    2: {name: tue, index: 1},
-    3: {name: wed, index: 2},
-    4: {name: thu, index: 3},
-    5: {name: fri, index: 4}
+    1: {name: mon, nameThS: "จ.", nameThL: "จันทร์"},
+    2: {name: tue, nameThS: "อ.", nameThL: "อังคาร"},
+    3: {name: wed, nameThS: "พ.", nameThL: "พุธ"},
+    4: {name: thu, nameThS: "พฤ.", nameThL: "พฤหัสฯ"},
+    5: {name: fri, nameThS: "ศ.", nameThL: "ศุกร์"}
 };
 
 let fixClass = [
@@ -730,19 +779,12 @@ let monthNames = [
 ];
 let monthCount = new Date().getMonth();
 let dateCount;
-let dayThNames = [
-    "จันทร์",
-    "อังคาร",
-    "พุธ",
-    "พฤหัสฯ",
-    "ศุกร์"
-];
 let currDate;
 let term = termCheck(monthCount, yearCount);
-let result = await loadNormalClass(term);
 let fixMode = false;
 let swapMode = false;
 let loadedClass;
+let loadedHomework;
 let clickCellClasses = Array(11);
 
 year.textContent = yearCount;
@@ -751,3 +793,5 @@ month.textContent = monthNames[monthCount];
 headerHeight();
 calendarCal(monthCount, yearCount);
 authChange((event, session) => checkUser(session));
+
+let result = await loadNormalClass(term);
